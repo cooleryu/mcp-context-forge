@@ -415,8 +415,8 @@ async def test_plugin_manager_captures_violation_details_in_otel_spans():
                 details={
                     "matched_pattern": "sensitive_keyword",
                     "field": "user_input",
-                    "password": "secret123",  # Should be sanitized
-                    "api_key": "sk-test-key",  # Should be sanitized
+                    "password": "secret123",  # pragma: allowlist secret
+                    "api_key": "sk-test-key",  # pragma: allowlist secret
                 },
                 http_status_code=403,
                 mcp_error_code=-32001,
@@ -437,8 +437,12 @@ async def test_plugin_manager_captures_violation_details_in_otel_spans():
 
         def set_status(self, status: Any) -> None:
             self.status = status
+            # Handle OpenTelemetry Status object which has description as a property
             if hasattr(status, "description"):
                 self.status_description = status.description
+            # Also handle string description directly
+            elif isinstance(status, str):
+                self.status_description = status
 
     recorded: List[RecordingSpan] = []
 
@@ -455,7 +459,25 @@ async def test_plugin_manager_captures_violation_details_in_otel_spans():
         payload = PromptPrehookPayload(prompt_id="test", args={"user": "test input"})
         global_context = GlobalContext(request_id="req-violation-test")
 
-        with patch("mcpgateway.plugins.framework.manager.create_span", side_effect=record_span):
+        # Mock set_span_error to capture status setting
+        def mock_set_span_error(span, error, *, record_exception=False):
+            if span:
+                # Simulate OpenTelemetry Status object
+                class MockStatus:
+                    def __init__(self, status_code, description):
+                        self.status_code = status_code
+                        self.description = description
+
+                # Import StatusCode to create proper status
+                try:
+                    from opentelemetry.trace import StatusCode
+                    span.set_status(MockStatus(StatusCode.ERROR, str(error)))
+                except ImportError:
+                    # Fallback if OpenTelemetry not available
+                    span.set_status(MockStatus("ERROR", str(error)))
+
+        with patch("mcpgateway.plugins.framework.manager.create_span", side_effect=record_span), \
+             patch("mcpgateway.observability.set_span_error", side_effect=mock_set_span_error):
             result, _ = await manager.invoke_hook(
                 PromptHookType.PROMPT_PRE_FETCH,
                 payload,
