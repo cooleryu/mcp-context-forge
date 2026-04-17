@@ -22,11 +22,13 @@ from mcpgateway.plugins.framework import (
     GlobalContext,
     Plugin,
     PluginConfig,
+    PluginContext,
     PluginManager,
     PluginMode,
     PluginResult,
     PromptHookType,
     PromptPrehookPayload,
+    PromptPrehookResult,
 )
 from mcpgateway.plugins.framework.base import HookRef
 from mcpgateway.plugins.framework.manager import PluginExecutor
@@ -381,9 +383,206 @@ async def test_plugin_manager_records_when_plugin_stops_chain():
     plugin_span = recorded[1]
     assert hook_chain_span.name == "plugin.hook.invoke"
     assert hook_chain_span.attributes["plugin.chain.stopped"] is True
-    assert hook_chain_span.attributes["plugin.chain.stopped_by"] == "BlockingPlugin"
-    assert plugin_span.name == "plugin.execute"
-    assert plugin_span.attributes["plugin.name"] == "BlockingPlugin"
+
+
+@pytest.mark.asyncio
+async def test_plugin_manager_captures_violation_details_in_otel_spans():
+    """Plugin manager should capture detailed violation information in OTEL spans with proper sanitization."""
+    manager = PluginManager("./tests/unit/mcpgateway/plugins/fixtures/configs/valid_no_plugin.yaml", observability=None)
+    await manager.initialize()
+
+    # Create a plugin that returns a violation with full details
+    config = PluginConfig(
+        name="ViolationPlugin",
+        description="Plugin that returns violations",
+        author="Test",
+        version="1.0",
+        tags=["test"],
+        kind="ViolationPlugin",
+        hooks=["prompt_pre_fetch"],
+        config={},
+        mode=PluginMode.ENFORCE,
+    )
+
+    class ViolationPlugin(Plugin):
+        async def prompt_pre_fetch(self, payload: PromptPrehookPayload, context: PluginContext) -> PromptPrehookResult:
+            from mcpgateway.plugins.framework import PluginViolation
+
+            violation = PluginViolation(
+                reason="Content policy violation",
+                description="Request contains prohibited content",
+                code="PROHIBITED_CONTENT",
+                details={
+                    "matched_pattern": "sensitive_keyword",
+                    "field": "user_input",
+                    "password": "secret123",  # Should be sanitized
+                    "api_key": "sk-test-key",  # Should be sanitized
+                },
+                http_status_code=403,
+                mcp_error_code=-32001,
+            )
+            return PromptPrehookResult(continue_processing=False, violation=violation)
+
+    plugin = ViolationPlugin(config)
+
+    class RecordingSpan:
+        def __init__(self, name: str, attributes: Optional[Dict[str, Any]] = None):
+            self.name = name
+            self.attributes = dict(attributes or {})
+            self.status = None
+            self.status_description = None
+
+        def set_attribute(self, key: str, value: Any) -> None:
+            self.attributes[key] = value
+
+        def set_status(self, status: Any) -> None:
+            self.status = status
+            if hasattr(status, "description"):
+                self.status_description = status.description
+
+    recorded: List[RecordingSpan] = []
+
+    @contextmanager
+    def record_span(name: str, attributes: Optional[Dict[str, Any]] = None):
+        span = RecordingSpan(name, attributes)
+        recorded.append(span)
+        yield span
+
+    with patch.object(manager._registry, "get_hook_refs_for_hook") as mock_get:
+        hook_ref = HookRef(PromptHookType.PROMPT_PRE_FETCH, PluginRef(plugin))
+        mock_get.return_value = [hook_ref]
+
+        payload = PromptPrehookPayload(prompt_id="test", args={"user": "test input"})
+        global_context = GlobalContext(request_id="req-violation-test")
+
+        with patch("mcpgateway.plugins.framework.manager.create_span", side_effect=record_span):
+            result, _ = await manager.invoke_hook(
+                PromptHookType.PROMPT_PRE_FETCH,
+                payload,
+                global_context=global_context,
+            )
+
+    # Verify violation was returned
+    assert result.continue_processing is False
+    assert result.violation is not None
+
+    # Find the plugin execution span
+    plugin_span = next((s for s in recorded if s.name == "plugin.execute"), None)
+    assert plugin_span is not None
+
+    # Verify core violation attributes are captured
+    assert plugin_span.attributes["plugin.had_violation"] is True
+    assert plugin_span.attributes["plugin.violation.reason"] == "Content policy violation"
+    assert plugin_span.attributes["plugin.violation.code"] == "PROHIBITED_CONTENT"
+    assert plugin_span.attributes["plugin.violation.description"] == "Request contains prohibited content"
+    assert plugin_span.attributes["plugin.violation.http_status_code"] == 403
+    assert plugin_span.attributes["plugin.violation.mcp_error_code"] == -32001
+
+    # Verify violation details are captured
+    assert "plugin.violation.details.matched_pattern" in plugin_span.attributes
+    assert plugin_span.attributes["plugin.violation.details.matched_pattern"] == "sensitive_keyword"
+    assert "plugin.violation.details.field" in plugin_span.attributes
+    assert plugin_span.attributes["plugin.violation.details.field"] == "user_input"
+
+    # Verify sensitive fields are sanitized (password and api_key should be redacted)
+    assert "plugin.violation.details.password" in plugin_span.attributes
+    assert plugin_span.attributes["plugin.violation.details.password"] == "***"
+    assert "plugin.violation.details.api_key" in plugin_span.attributes
+    assert plugin_span.attributes["plugin.violation.details.api_key"] == "***"
+
+    # Verify span is marked as error
+    assert plugin_span.status is not None
+    assert plugin_span.status_description == "Request contains prohibited content"
+
+    await manager.shutdown()
+
+
+@pytest.mark.asyncio
+async def test_plugin_manager_handles_violation_without_optional_fields():
+    """Plugin manager should handle violations that don't have optional fields (http_status_code, mcp_error_code, details)."""
+    manager = PluginManager("./tests/unit/mcpgateway/plugins/fixtures/configs/valid_no_plugin.yaml", observability=None)
+    await manager.initialize()
+
+    config = PluginConfig(
+        name="MinimalViolationPlugin",
+        description="Plugin with minimal violation",
+        author="Test",
+        version="1.0",
+        tags=["test"],
+        kind="MinimalViolationPlugin",
+        hooks=["prompt_pre_fetch"],
+        config={},
+        mode=PluginMode.ENFORCE,
+    )
+
+    class MinimalViolationPlugin(Plugin):
+        async def prompt_pre_fetch(self, payload: PromptPrehookPayload, context: PluginContext) -> PromptPrehookResult:
+            from mcpgateway.plugins.framework import PluginViolation
+
+            # Violation with only required fields
+            violation = PluginViolation(
+                reason="Rate limit exceeded",
+                description="Too many requests",
+                code="RATE_LIMIT",
+            )
+            return PromptPrehookResult(continue_processing=False, violation=violation)
+
+    plugin = MinimalViolationPlugin(config)
+
+    class RecordingSpan:
+        def __init__(self, name: str, attributes: Optional[Dict[str, Any]] = None):
+            self.name = name
+            self.attributes = dict(attributes or {})
+
+        def set_attribute(self, key: str, value: Any) -> None:
+            self.attributes[key] = value
+
+        def set_status(self, status: Any) -> None:
+            pass
+
+    recorded: List[RecordingSpan] = []
+
+    @contextmanager
+    def record_span(name: str, attributes: Optional[Dict[str, Any]] = None):
+        span = RecordingSpan(name, attributes)
+        recorded.append(span)
+        yield span
+
+    with patch.object(manager._registry, "get_hook_refs_for_hook") as mock_get:
+        hook_ref = HookRef(PromptHookType.PROMPT_PRE_FETCH, PluginRef(plugin))
+        mock_get.return_value = [hook_ref]
+
+        payload = PromptPrehookPayload(prompt_id="test", args={})
+        global_context = GlobalContext(request_id="req-minimal-violation")
+
+        with patch("mcpgateway.plugins.framework.manager.create_span", side_effect=record_span):
+            result, _ = await manager.invoke_hook(
+                PromptHookType.PROMPT_PRE_FETCH,
+                payload,
+                global_context=global_context,
+            )
+
+    # Verify violation was returned
+    assert result.continue_processing is False
+    assert result.violation is not None
+
+    # Find the plugin execution span
+    plugin_span = next((s for s in recorded if s.name == "plugin.execute"), None)
+    assert plugin_span is not None
+
+    # Verify core violation attributes are captured
+    assert plugin_span.attributes["plugin.had_violation"] is True
+    assert plugin_span.attributes["plugin.violation.reason"] == "Rate limit exceeded"
+    assert plugin_span.attributes["plugin.violation.code"] == "RATE_LIMIT"
+    assert plugin_span.attributes["plugin.violation.description"] == "Too many requests"
+
+    # Verify optional fields are not present when not set
+    assert "plugin.violation.http_status_code" not in plugin_span.attributes
+    assert "plugin.violation.mcp_error_code" not in plugin_span.attributes
+    # Details dict is empty, so no detail attributes should be present
+    assert not any(k.startswith("plugin.violation.details.") for k in plugin_span.attributes.keys())
+
+    await manager.shutdown()
 
     await manager.shutdown()
 

@@ -499,17 +499,68 @@ class PluginExecutor:
                 otel_span.set_attribute("plugin.continue_processing", result.continue_processing)
                 otel_span.set_attribute("plugin.stopped_chain", not result.continue_processing)
 
-            # End span with success
+                # Add detailed violation information when present
+                if result.violation:
+                    # First-Party
+                    from mcpgateway.observability import set_span_attribute, set_span_error
+
+                    # Add core violation fields (set_span_attribute handles sanitization)
+                    set_span_attribute(otel_span, "plugin.violation.reason", result.violation.reason)
+                    set_span_attribute(otel_span, "plugin.violation.code", result.violation.code)
+                    set_span_attribute(otel_span, "plugin.violation.description", result.violation.description)
+
+                    # Add HTTP status code if present (e.g., 429 for rate limiting)
+                    if result.violation.http_status_code:
+                        set_span_attribute(otel_span, "plugin.violation.http_status_code", result.violation.http_status_code)
+
+                    # Add MCP error code if present
+                    if result.violation.mcp_error_code:
+                        set_span_attribute(otel_span, "plugin.violation.mcp_error_code", result.violation.mcp_error_code)
+
+                    # Add violation details with sanitization to prevent PII leakage
+                    # Pass just the key name (not the full path) to sanitization for proper field matching
+                    if result.violation.details:
+                        # First-Party
+                        from mcpgateway.utils.trace_redaction import sanitize_trace_attribute_value
+
+                        for key, value in result.violation.details.items():
+                            # Sanitize using just the key name for proper redaction field matching
+                            sanitized_value = sanitize_trace_attribute_value(key, value)
+                            # Use _set_pre_sanitized_span_attribute to avoid double sanitization
+                            if otel_span and sanitized_value is not None:
+                                otel_span.set_attribute(f"plugin.violation.details.{key}", sanitized_value)
+
+                    # Mark span as error for better visibility in observability platforms
+                    set_span_error(otel_span, result.violation.description, record_exception=False)
+
+            # End span with success or error based on violation
             if span_id is not None:
                 try:
+                    span_attributes = {
+                        "plugin.had_violation": result.violation is not None,
+                        "plugin.modified_payload": result.modified_payload is not None,
+                        "plugin.continue_processing": result.continue_processing,
+                    }
+
+                    # Add violation details to internal observability span as well
+                    if result.violation:
+                        # First-Party
+                        from mcpgateway.utils.trace_redaction import sanitize_trace_attribute_value
+
+                        span_attributes["plugin.violation.reason"] = sanitize_trace_attribute_value("plugin.violation.reason", result.violation.reason)
+                        span_attributes["plugin.violation.code"] = sanitize_trace_attribute_value("plugin.violation.code", result.violation.code)
+                        span_attributes["plugin.violation.description"] = sanitize_trace_attribute_value("plugin.violation.description", result.violation.description)
+
+                        if result.violation.http_status_code:
+                            span_attributes["plugin.violation.http_status_code"] = result.violation.http_status_code
+
+                        if result.violation.mcp_error_code:
+                            span_attributes["plugin.violation.mcp_error_code"] = result.violation.mcp_error_code
+
                     self.observability.end_span(
                         span_id=span_id,
-                        status="ok",
-                        attributes={
-                            "plugin.had_violation": result.violation is not None,
-                            "plugin.modified_payload": result.modified_payload is not None,
-                            "plugin.continue_processing": result.continue_processing,
-                        },
+                        status="error" if result.violation else "ok",
+                        attributes=span_attributes,
                     )
                 except Exception as e:
                     logger.debug("Plugin observability end_span failed: %s", e)
