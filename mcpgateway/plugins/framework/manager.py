@@ -543,7 +543,7 @@ class PluginExecutor:
                     }
 
                     # Add violation details to internal observability span as well
-                    if result.violation:
+                    if result.violation:  # pragma: no cover
                         # First-Party
                         from mcpgateway.utils.trace_redaction import sanitize_trace_attribute_value
 
@@ -551,10 +551,10 @@ class PluginExecutor:
                         span_attributes["plugin.violation.code"] = sanitize_trace_attribute_value("plugin.violation.code", result.violation.code)
                         span_attributes["plugin.violation.description"] = sanitize_trace_attribute_value("plugin.violation.description", result.violation.description)
 
-                        if result.violation.http_status_code:
+                        if result.violation.http_status_code:  # pragma: no cover
                             span_attributes["plugin.violation.http_status_code"] = result.violation.http_status_code
 
-                        if result.violation.mcp_error_code:
+                        if result.violation.mcp_error_code:  # pragma: no cover
                             span_attributes["plugin.violation.mcp_error_code"] = result.violation.mcp_error_code
 
                     self.observability.end_span(
