@@ -5885,8 +5885,8 @@ async def read_resource(resource_id: str, request: Request, db: Session = Depend
 
         # Check if token_teams exists in request.state (set by auth middleware)
         # Use a sentinel to distinguish "not set" from "set to None"
-        _UNSET = object()
-        token_teams = getattr(request.state, "token_teams", _UNSET)
+        sentinel_unset = object()
+        token_teams = getattr(request.state, "token_teams", sentinel_unset)
 
         # Determine authorization parameters based on token configuration
         # Admin with teams=None: admin bypass (public + team access, NOT private)
@@ -5899,7 +5899,7 @@ async def read_resource(resource_id: str, request: Request, db: Session = Depend
         else:
             # Team-scoped, non-admin, or token_teams not set: normal access control
             auth_user_email = user_email
-            auth_token_teams = None if token_teams is _UNSET else token_teams
+            auth_token_teams = None if token_teams is sentinel_unset else token_teams
 
         # Call service with context for plugin support
         content = await resource_service.read_resource(
@@ -6419,8 +6419,8 @@ async def get_prompt(
     server_id = request.headers.get("X-Server-ID")
 
     # Check if token_teams exists in request.state (set by auth middleware)
-    _UNSET = object()
-    token_teams = getattr(request.state, "token_teams", _UNSET)
+    sentinel_unset = object()
+    token_teams = getattr(request.state, "token_teams", sentinel_unset)
 
     # Determine authorization parameters based on token configuration
     # Admin with teams=None: admin bypass (public + team access, NOT private)
@@ -6433,7 +6433,7 @@ async def get_prompt(
     else:
         # Team-scoped, non-admin, or token_teams not set: normal access control
         auth_user_email = user_email
-        auth_token_teams = None if token_teams is _UNSET else token_teams
+        auth_token_teams = None if token_teams is sentinel_unset else token_teams
 
     try:
         PromptExecuteArgs(args=args)
@@ -6497,8 +6497,8 @@ async def get_prompt_no_args(
     server_id = request.headers.get("X-Server-ID")
 
     # Check if token_teams exists in request.state (set by auth middleware)
-    _UNSET = object()
-    token_teams = getattr(request.state, "token_teams", _UNSET)
+    sentinel_unset = object()
+    token_teams = getattr(request.state, "token_teams", sentinel_unset)
 
     # Determine authorization parameters based on token configuration
     # Admin with teams=None: admin bypass (public + team access, NOT private)
@@ -6511,7 +6511,7 @@ async def get_prompt_no_args(
     else:
         # Team-scoped, non-admin, or token_teams not set: normal access control
         auth_user_email = user_email
-        auth_token_teams = None if token_teams is _UNSET else token_teams
+        auth_token_teams = None if token_teams is sentinel_unset else token_teams
 
     try:
         return await prompt_service.get_prompt(
