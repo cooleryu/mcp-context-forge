@@ -83,7 +83,8 @@ class BaseService(ABC):
             if no auth context is present.
         """
         if user_email is None and token_teams is None:
-            return query
+            model_cls = self._visibility_model_cls
+            return query.where(model_cls.visibility != "private")
 
         effective_teams: List[str] = []
         if token_teams is not None:

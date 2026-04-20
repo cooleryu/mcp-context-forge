@@ -1155,9 +1155,10 @@ class ToolService(BaseService):
             return True
 
         # Admin bypass: token_teams=None AND user_email=None means unrestricted admin
-        # This happens when is_admin=True and no team scoping in token
+        # However, private resources are NEVER accessible via admin bypass (security requirement)
         if token_teams is None and user_email is None:
-            return True
+            # Admin bypass grants access to public and team resources, but NOT private
+            return visibility != "private"
 
         # No user context (but not admin) = deny access to non-public tools
         if not user_email:
@@ -3049,12 +3050,12 @@ class ToolService(BaseService):
         requesting_user_team_roles: Optional[Dict[str, str]] = None,
     ) -> ToolRead:
         """
-        Retrieve a tool by its ID.
+        Retrieve a tool by its ID with access control.
 
         Args:
             db (Session): The SQLAlchemy database session.
             tool_id (str): The unique identifier of the tool.
-            requesting_user_email (Optional[str]): Email of the requesting user for header masking.
+            requesting_user_email (Optional[str]): Email of the requesting user for access control.
             requesting_user_is_admin (bool): Whether the requester is an admin.
             requesting_user_team_roles (Optional[Dict[str, str]]): {team_id: role} for the requester.
 
@@ -3062,7 +3063,7 @@ class ToolService(BaseService):
             ToolRead: The tool object.
 
         Raises:
-            ToolNotFoundError: If the tool is not found.
+            ToolNotFoundError: If the tool is not found or access is denied.
 
         Examples:
             >>> from mcpgateway.services.tool_service import ToolService
@@ -3078,6 +3079,22 @@ class ToolService(BaseService):
         """
         tool = db.get(DbTool, tool_id)
         if not tool:
+            raise ToolNotFoundError(f"Tool not found: {tool_id}")
+
+        # Access control check: verify user has permission to access this tool
+        # Admin bypass: requesting_user_is_admin=True AND requesting_user_email=None
+        # means unrestricted access to public and team tools (NOT private)
+        user_email = None if (requesting_user_is_admin and requesting_user_email is None) else requesting_user_email
+        token_teams = None if (requesting_user_is_admin and requesting_user_email is None) else (list(requesting_user_team_roles.keys()) if requesting_user_team_roles else None)
+
+        tool_payload = {
+            "visibility": tool.visibility,
+            "team_id": tool.team_id,
+            "owner_email": tool.owner_email,
+        }
+
+        if not await self._check_tool_access(db, tool_payload, user_email, token_teams):
+            # Don't reveal tool existence - return generic "not found"
             raise ToolNotFoundError(f"Tool not found: {tool_id}")
 
         tool_read = self.convert_tool_to_read(

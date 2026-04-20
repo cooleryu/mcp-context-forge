@@ -1740,9 +1740,10 @@ class PromptService(BaseService):
             return True
 
         # Admin bypass: token_teams=None AND user_email=None means unrestricted admin
-        # This happens when is_admin=True and no team scoping in token
+        # However, private resources are NEVER accessible via admin bypass (security requirement)
         if token_teams is None and user_email is None:
-            return True
+            # Admin bypass grants access to public and team resources, but NOT private
+            return visibility != "private"
 
         # No user context (but not admin) = deny access to non-public prompts
         if not user_email:
