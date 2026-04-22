@@ -1840,7 +1840,7 @@ async def test_auth_all_ok(monkeypatch):
         messages.append(msg)
 
     scope = _make_scope(
-        "/servers/1/mcp",
+        "/v1/servers/1/mcp",
         headers=[(b"authorization", b"Bearer good-token")],
     )
 
@@ -1865,7 +1865,7 @@ async def test_auth_failure(monkeypatch):
         sent.append(msg)
 
     scope = _make_scope(
-        "/servers/1/mcp",
+        "/v1/servers/1/mcp",
         headers=[(b"authorization", b"Bearer bad")],
     )
 
@@ -1949,7 +1949,7 @@ async def test_streamable_http_auth_requires_auth_for_servers_mcp_sse(monkeypatc
     """Auth should require authentication for /servers/{id}/mcp/sse paths."""
     monkeypatch.setattr("mcpgateway.transports.streamablehttp_transport.settings.mcp_require_auth", True)
     monkeypatch.setattr(tr, "_check_server_oauth_enforcement", AsyncMock(return_value=None))
-    scope = _make_scope("/servers/test-server-id/mcp/sse")
+    scope = _make_scope("/v1/servers/test-server-id/mcp/sse")
     called = []
 
     async def send(msg):
@@ -1969,7 +1969,7 @@ async def test_streamable_http_auth_requires_auth_for_servers_mcp_message(monkey
     """Auth should require authentication for /servers/{id}/mcp/message paths."""
     monkeypatch.setattr("mcpgateway.transports.streamablehttp_transport.settings.mcp_require_auth", True)
     monkeypatch.setattr(tr, "_check_server_oauth_enforcement", AsyncMock(return_value=None))
-    scope = _make_scope("/servers/test-server-id/mcp/message")
+    scope = _make_scope("/v1/servers/test-server-id/mcp/message")
     called = []
 
     async def send(msg):
@@ -2044,7 +2044,7 @@ async def test_streamable_http_auth_allows_mcp_message_with_valid_token(monkeypa
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("path", ["/mcp/sse/", "/mcp/message/", "/servers/test-id/mcp/sse/", "/servers/test-id/mcp/message/"])
+@pytest.mark.parametrize("path", ["/mcp/sse/", "/mcp/message/", "/v1/servers/test-id/mcp/sse/", "/v1/servers/test-id/mcp/message/"])
 async def test_streamable_http_auth_requires_auth_for_trailing_slash_variants(monkeypatch, path):
     """Auth must not be bypassed by appending a trailing slash to MCP transport paths."""
     monkeypatch.setattr("mcpgateway.transports.streamablehttp_transport.settings.mcp_require_auth", True)
@@ -2067,7 +2067,7 @@ async def test_streamable_http_auth_skips_cors_preflight():
     # A proper preflight has: OPTIONS method + Origin header + Access-Control-Request-Method header
     # See: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#preflighted_requests
     scope = _make_scope(
-        "/servers/1/mcp",
+        "/v1/servers/1/mcp",
         method="OPTIONS",
         headers=[
             (b"origin", b"http://localhost:3000"),
@@ -2093,7 +2093,7 @@ async def test_streamable_http_auth_requires_auth_for_options_without_cors_heade
     monkeypatch.setattr(tr, "_check_server_oauth_enforcement", AsyncMock(return_value=None))
 
     # OPTIONS request without Origin or Access-Control-Request-Method is NOT a CORS preflight
-    scope = _make_scope("/servers/1/mcp", method="OPTIONS")
+    scope = _make_scope("/v1/servers/1/mcp", method="OPTIONS")
     called = []
 
     async def send(msg):
@@ -2114,7 +2114,7 @@ async def test_streamable_http_auth_no_authorization_strict_mode(monkeypatch):
     # Stub per-server OAuth check — this test validates strict-mode 401, not per-server OAuth
     monkeypatch.setattr(tr, "_check_server_oauth_enforcement", AsyncMock(return_value=None))
 
-    scope = _make_scope("/servers/1/mcp")
+    scope = _make_scope("/v1/servers/1/mcp")
     called = []
 
     async def send(msg):
@@ -2134,7 +2134,7 @@ async def test_streamable_http_auth_no_authorization_permissive_mode(monkeypatch
     # Stub out per-server OAuth check — this test validates permissive-mode plumbing, not OAuth
     monkeypatch.setattr(tr, "_check_server_oauth_enforcement", AsyncMock(return_value=None))
 
-    scope = _make_scope("/servers/1/mcp")
+    scope = _make_scope("/v1/servers/1/mcp")
     called = []
 
     async def send(msg):
@@ -2244,7 +2244,7 @@ async def test_streamable_http_auth_oauth_server_returns_resource_metadata_in_st
 
     monkeypatch.setattr("mcpgateway.transports.streamablehttp_transport.get_db", _make_fake_get_db(mock_db))
 
-    scope = _make_scope("/servers/abc123def/mcp")
+    scope = _make_scope("/v1/servers/abc123def/mcp")
     called = []
 
     async def send(msg):
@@ -2274,7 +2274,7 @@ async def test_streamable_http_auth_wrong_scheme(monkeypatch):
     monkeypatch.setattr("mcpgateway.transports.streamablehttp_transport.settings.mcp_require_auth", True)
     # Stub per-server OAuth check — this test validates scheme rejection, not OAuth
     monkeypatch.setattr(tr, "_check_server_oauth_enforcement", AsyncMock(return_value=None))
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Basic foobar")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Basic foobar")])
     called = []
 
     async def send(msg):
@@ -2296,7 +2296,7 @@ async def test_streamable_http_auth_bearer_no_token(monkeypatch):
     monkeypatch.setattr(tr, "verify_credentials", fake_verify)
     # Enable strict auth mode to test 401 behavior
     monkeypatch.setattr("mcpgateway.transports.streamablehttp_transport.settings.mcp_require_auth", True)
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer")])
     called = []
 
     async def send(msg):
@@ -2317,7 +2317,7 @@ async def test_streamable_http_auth_bearer_no_token_permissive_mode(monkeypatch)
 
     monkeypatch.setattr(tr, "verify_credentials", fake_verify)
     monkeypatch.setattr("mcpgateway.transports.streamablehttp_transport.settings.mcp_require_auth", False)
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer")])
     called = []
 
     async def send(msg):
@@ -2440,7 +2440,7 @@ async def test_session_manager_wrapper_handle_streamable_http(monkeypatch):
     monkeypatch.setattr(tr, "StreamableHTTPSessionManager", lambda **kwargs: DummySessionManager())
     wrapper = SessionManagerWrapper()
     await wrapper.initialize()
-    scope = _make_scope("/servers/123/mcp")
+    scope = _make_scope("/v1/servers/123/mcp")
     sent = []
     await wrapper.handle_streamable_http(scope, None, send)
     await wrapper.shutdown()
@@ -2525,7 +2525,7 @@ async def test_session_manager_wrapper_handle_streamable_http_exception(monkeypa
     monkeypatch.setattr(tr, "StreamableHTTPSessionManager", lambda **kwargs: DummySessionManager())
     wrapper = SessionManagerWrapper()
     await wrapper.initialize()
-    scope = _make_scope("/servers/123/mcp")
+    scope = _make_scope("/v1/servers/123/mcp")
 
     # Track what was sent
     sent_messages = []
@@ -2683,7 +2683,7 @@ async def test_streamable_http_auth_sets_user_context_with_teams(monkeypatch):
     mock_auth_cache = MagicMock()
     mock_auth_cache.get_team_membership_valid_sync.return_value = True
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer good-token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer good-token")])
     messages = []
 
     async def send(msg):
@@ -2722,7 +2722,7 @@ async def test_streamable_http_auth_normalizes_dict_teams(monkeypatch):
     mock_auth_cache = MagicMock()
     mock_auth_cache.get_team_membership_valid_sync.return_value = True
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer good-token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer good-token")])
 
     async def send(msg):
         pass
@@ -2750,7 +2750,7 @@ async def test_streamable_http_auth_handles_empty_teams(monkeypatch):
 
     monkeypatch.setattr(tr, "verify_credentials", fake_verify)
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer good-token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer good-token")])
 
     async def send(msg):
         pass
@@ -2783,7 +2783,7 @@ async def test_streamable_http_auth_uses_email_field_fallback(monkeypatch):
     mock_auth_cache = MagicMock()
     mock_auth_cache.get_team_membership_valid_sync.return_value = True
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer good-token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer good-token")])
 
     async def send(msg):
         pass
@@ -2809,7 +2809,7 @@ async def test_streamable_http_auth_handles_missing_teams_key(monkeypatch):
 
     monkeypatch.setattr(tr, "verify_credentials", fake_verify)
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer good-token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer good-token")])
 
     async def send(msg):
         pass
@@ -2840,7 +2840,7 @@ async def test_streamable_http_auth_rejects_removed_team_member(monkeypatch):
     mock_auth_cache = MagicMock()
     mock_auth_cache.get_team_membership_valid_sync.return_value = False
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer valid-but-stale-token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer valid-but-stale-token")])
     sent = []
 
     async def send(msg):
@@ -2886,7 +2886,7 @@ async def test_streamable_http_auth_validates_team_membership_on_cache_miss(monk
     mock_session_local.return_value.__enter__ = MagicMock(return_value=mock_db)
     mock_session_local.return_value.__exit__ = MagicMock(return_value=False)
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
     sent = []
 
     async def send(msg):
@@ -2919,7 +2919,7 @@ async def test_streamable_http_auth_handles_null_teams(monkeypatch):
 
     monkeypatch.setattr(tr, "verify_credentials", fake_verify)
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer good-token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer good-token")])
 
     async def send(msg):
         pass
@@ -2945,7 +2945,7 @@ async def test_streamable_http_auth_top_level_is_admin(monkeypatch):
 
     monkeypatch.setattr(tr, "verify_credentials", fake_verify)
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer good-token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer good-token")])
 
     async def send(msg):
         pass
@@ -2972,7 +2972,7 @@ async def test_streamable_http_auth_nested_is_admin_takes_precedence(monkeypatch
 
     monkeypatch.setattr(tr, "verify_credentials", fake_verify)
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer good-token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer good-token")])
 
     async def send(msg):
         pass
@@ -4875,7 +4875,7 @@ async def test_streamable_http_auth_proxy_user_when_client_auth_disabled(monkeyp
     monkeypatch.setattr("mcpgateway.transports.streamablehttp_transport.settings.proxy_user_header", "x-forwarded-user")
 
     scope = _make_scope(
-        "/servers/1/mcp",
+        "/v1/servers/1/mcp",
         headers=[
             (b"x-forwarded-user", b"proxy_user@example.com"),
         ],
@@ -4910,7 +4910,7 @@ async def test_streamable_http_auth_proxy_user_with_bearer_header(monkeypatch):
     monkeypatch.setattr("mcpgateway.transports.streamablehttp_transport.settings.proxy_user_header", "x-forwarded-user")
 
     scope = _make_scope(
-        "/servers/1/mcp",
+        "/v1/servers/1/mcp",
         headers=[
             (b"authorization", b"Bearer bad-token"),
             (b"x-forwarded-user", b"proxy_fallback@example.com"),
@@ -4946,7 +4946,7 @@ async def test_streamable_http_auth_proxy_user_context_on_valid_jwt(monkeypatch)
     monkeypatch.setattr("mcpgateway.transports.streamablehttp_transport.settings.proxy_user_header", "x-forwarded-user")
 
     scope = _make_scope(
-        "/servers/1/mcp",
+        "/v1/servers/1/mcp",
         headers=[
             (b"authorization", b"Bearer valid-token"),
             (b"x-forwarded-user", b"proxy_user@example.com"),
@@ -5000,7 +5000,7 @@ async def test_streamable_http_auth_caches_positive_team_membership(monkeypatch)
     mock_session_local.return_value.__enter__ = MagicMock(return_value=mock_db)
     mock_session_local.return_value.__exit__ = MagicMock(return_value=False)
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
     sent = []
 
     async def send(msg):
@@ -5049,7 +5049,7 @@ async def test_streamable_http_auth_db_context_manager(monkeypatch):
     mock_execute.scalars.return_value = mock_scalars
     mock_db.execute.return_value = mock_execute
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
     sent = []
 
     async def send(msg):
@@ -5281,7 +5281,7 @@ async def test_streamable_http_auth_no_proxy_user_when_client_auth_disabled(monk
     monkeypatch.setattr(tr, "_check_server_oauth_enforcement", AsyncMock(return_value=None))
 
     # No proxy user header, no authorization - falls through to permissive mode
-    scope = _make_scope("/servers/1/mcp")
+    scope = _make_scope("/v1/servers/1/mcp")
     sent = []
 
     async def send(msg):
@@ -7910,7 +7910,7 @@ async def test_streamable_http_auth_allows_authenticated_oauth_server_on_get(mon
     mock_auth_cache = MagicMock()
     mock_auth_cache.get_team_membership_valid_sync.return_value = True
 
-    scope = _make_scope("/servers/abc123def/mcp", method="GET", headers=[(b"authorization", b"Bearer valid-token")])
+    scope = _make_scope("/v1/servers/abc123def/mcp", method="GET", headers=[(b"authorization", b"Bearer valid-token")])
     called = []
 
     async def send(msg):
@@ -7936,7 +7936,7 @@ async def test_handle_streamable_http_get_server_scoped_405_after_validation(mon
     wrapper = SessionManagerWrapper()
     await wrapper.initialize()
     send, messages = _make_send_collector()
-    await wrapper.handle_streamable_http(_make_scope("/servers/abc/mcp", method="GET"), _make_receive(b""), send)
+    await wrapper.handle_streamable_http(_make_scope("/v1/servers/abc/mcp", method="GET"), _make_receive(b""), send)
     await wrapper.shutdown()
 
     assert not sdk.called
@@ -7955,7 +7955,7 @@ async def test_handle_streamable_http_get_nonexistent_server_returns_404_not_405
     wrapper = SessionManagerWrapper()
     await wrapper.initialize()
     send, messages = _make_send_collector()
-    await wrapper.handle_streamable_http(_make_scope("/servers/bogus/mcp", method="GET"), _make_receive(b""), send)
+    await wrapper.handle_streamable_http(_make_scope("/v1/servers/bogus/mcp", method="GET"), _make_receive(b""), send)
     await wrapper.shutdown()
 
     assert not sdk.called
@@ -8238,7 +8238,7 @@ async def test_forwarded_post_injects_server_id_from_url(monkeypatch):
     # Body WITHOUT params field - this triggers line 1865 (params dict creation)
     body = b'{"jsonrpc":"2.0","method":"tools/list","id":1}'
     scope = _make_scope(
-        f"/servers/{server_id}/mcp",
+        f"/v1/servers/{server_id}/mcp",
         method="POST",
         headers=[(b"x-forwarded-internally", b"true")],
     )
@@ -8296,7 +8296,7 @@ async def test_forwarded_post_injects_server_id_with_existing_params(monkeypatch
     # Body WITH existing params containing other keys
     body = b'{"jsonrpc":"2.0","method":"tools/list","params":{"cursor":"page2","extra":"value"},"id":1}'
     scope = _make_scope(
-        f"/servers/{server_id}/mcp",
+        f"/v1/servers/{server_id}/mcp",
         method="POST",
         headers=[(b"x-forwarded-internally", b"true")],
     )
@@ -8359,7 +8359,7 @@ async def test_forwarded_post_injects_server_id_with_non_dict_params(monkeypatch
     server_id = "abc-123-def-456"
     send, messages = _make_send_collector()
     scope = _make_scope(
-        f"/servers/{server_id}/mcp",
+        f"/v1/servers/{server_id}/mcp",
         method="POST",
         headers=[(b"x-forwarded-internally", b"true")],
     )
@@ -8507,7 +8507,7 @@ async def test_forwarded_post_notification_no_server_id_injection(monkeypatch):
     send, messages = _make_send_collector()
     body = b'{"jsonrpc":"2.0","method":"notifications/initialized"}'
     scope = _make_scope(
-        f"/servers/{server_id}/mcp",
+        f"/v1/servers/{server_id}/mcp",
         method="POST",
         headers=[(b"x-forwarded-internally", b"true")],
     )
@@ -8548,7 +8548,7 @@ async def test_local_affinity_post_injects_server_id_regression(monkeypatch):
 
     server_id = "abc-def-123-456"  # Valid hex format
     original_body = orjson.dumps({"jsonrpc": "2.0", "method": "tools/list", "params": {}, "id": 1})
-    scope = _make_scope(f"/servers/{server_id}/mcp", method="POST", headers=[(b"mcp-session-id", b"sess-1")])
+    scope = _make_scope(f"/v1/servers/{server_id}/mcp", method="POST", headers=[(b"mcp-session-id", b"sess-1")])
     receive = _make_receive(original_body)
     send, messages = _make_send_collector()
 
@@ -8620,7 +8620,7 @@ async def test_local_affinity_post_injects_server_id_with_non_dict_params(monkey
     await wrapper.initialize()
 
     server_id = "abc-def-123-456"
-    scope = _make_scope(f"/servers/{server_id}/mcp", method="POST", headers=[(b"mcp-session-id", b"sess-1")])
+    scope = _make_scope(f"/v1/servers/{server_id}/mcp", method="POST", headers=[(b"mcp-session-id", b"sess-1")])
     receive = _make_receive(params_json)
     send, messages = _make_send_collector()
 
@@ -9621,7 +9621,7 @@ async def test_auth_session_token_admin_bypass(monkeypatch):
 
     monkeypatch.setattr(tr, "verify_credentials", fake_verify)
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer session-tok")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer session-tok")])
     sent = []
 
     async def send(msg):
@@ -9650,7 +9650,7 @@ async def test_auth_session_token_resolves_teams_from_db(monkeypatch):
 
     mock_resolve = AsyncMock(return_value=["team-a", "team-b"])
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer session-tok")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer session-tok")])
     sent = []
 
     async def send(msg):
@@ -9685,7 +9685,7 @@ async def test_auth_session_token_no_email_public_only(monkeypatch):
 
     monkeypatch.setattr(tr, "verify_credentials", fake_verify)
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer session-tok")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer session-tok")])
     sent = []
 
     async def send(msg):
@@ -9710,7 +9710,7 @@ async def test_streamable_http_auth_verify_credentials_non_dict_payload(monkeypa
 
     monkeypatch.setattr(tr, "verify_credentials", fake_verify)
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer good-token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer good-token")])
     sent = []
 
     async def send(msg):
@@ -9733,7 +9733,7 @@ async def test_streamable_http_auth_rejects_revoked_jwt(monkeypatch):
 
     monkeypatch.setattr(tr, "verify_credentials", fake_verify)
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
     sent = []
 
     async def send(msg):
@@ -9763,7 +9763,7 @@ async def test_streamable_http_auth_uses_cached_auth_context(monkeypatch):
 
     monkeypatch.setattr(tr, "verify_credentials", fake_verify)
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
     sent = []
 
     async def send(msg):
@@ -9812,7 +9812,7 @@ async def test_streamable_http_auth_rejects_revoked_cached_auth_context(monkeypa
 
     monkeypatch.setattr(tr, "verify_credentials", fake_verify)
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
     sent = []
 
     async def send(msg):
@@ -9860,7 +9860,7 @@ async def test_streamable_http_auth_rejects_inactive_cached_auth_context(monkeyp
 
     monkeypatch.setattr(tr, "verify_credentials", fake_verify)
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
     sent = []
 
     async def send(msg):
@@ -9908,7 +9908,7 @@ async def test_streamable_http_auth_uses_batched_auth_context(monkeypatch):
 
     monkeypatch.setattr(tr, "verify_credentials", fake_verify)
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
     sent = []
 
     async def send(msg):
@@ -9958,7 +9958,7 @@ async def test_streamable_http_auth_rejects_revoked_batched_auth_context(monkeyp
 
     monkeypatch.setattr(tr, "verify_credentials", fake_verify)
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
     sent = []
 
     async def send(msg):
@@ -10005,7 +10005,7 @@ async def test_streamable_http_auth_rejects_inactive_batched_auth_context(monkey
 
     monkeypatch.setattr(tr, "verify_credentials", fake_verify)
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
     sent = []
 
     async def send(msg):
@@ -10051,7 +10051,7 @@ async def test_streamable_http_auth_rejects_inactive_user(monkeypatch):
 
     monkeypatch.setattr(tr, "verify_credentials", fake_verify)
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
     sent = []
 
     async def send(msg):
@@ -10085,7 +10085,7 @@ async def test_streamable_http_auth_revocation_check_exception_fails_open(monkey
 
     monkeypatch.setattr(tr, "verify_credentials", fake_verify)
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
     sent = []
 
     async def send(msg):
@@ -10116,7 +10116,7 @@ async def test_streamable_http_auth_rejects_missing_user_when_required(monkeypat
     monkeypatch.setattr("mcpgateway.transports.streamablehttp_transport.settings.require_user_in_db", True)
     monkeypatch.setattr("mcpgateway.transports.streamablehttp_transport.settings.platform_admin_email", "admin@example.com")
 
-    scope = _make_scope("/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
+    scope = _make_scope("/v1/servers/1/mcp", headers=[(b"authorization", b"Bearer token")])
     sent = []
 
     async def send(msg):
@@ -11758,7 +11758,7 @@ async def test_get_request_context_stateful_success(monkeypatch):
     valid_hex_id = "abc-123-def-456"
 
     mock_request = MagicMock()
-    mock_request.url.path = f"/servers/{valid_hex_id}/mcp"
+    mock_request.url.path = f"/v1/servers/{valid_hex_id}/mcp"
     mock_request.headers = {"authorization": "Bearer token"}
     mock_request.cookies = {}
 
@@ -11853,7 +11853,7 @@ async def test_local_affinity_post_injects_server_id(monkeypatch):
 
     # Use a HEX server ID because the regex enforces [a-fA-F0-9\-]+
     server_id = "abc-123-def-456"
-    scope = _make_scope(f"/servers/{server_id}/mcp", method="POST", headers=[(b"mcp-session-id", b"sess-1")])
+    scope = _make_scope(f"/v1/servers/{server_id}/mcp", method="POST", headers=[(b"mcp-session-id", b"sess-1")])
 
     original_body = orjson.dumps({"jsonrpc": "2.0", "method": "test", "params": {}})
     receive = _make_receive(original_body)
@@ -11921,7 +11921,7 @@ async def test_handle_streamable_http_server_scope_requires_servers_use(monkeypa
     try:
         monkeypatch.setattr("mcpgateway.transports.streamablehttp_transport._check_streamable_permission", AsyncMock(return_value=False))
 
-        scope = _make_scope("/servers/abc-123-def/mcp", method="POST", headers=[(b"mcp-session-id", b"sess-1")])
+        scope = _make_scope("/v1/servers/abc-123-def/mcp", method="POST", headers=[(b"mcp-session-id", b"sess-1")])
         receive = _make_receive(orjson.dumps({"jsonrpc": "2.0", "method": "tools/list", "params": {}, "id": "1"}))
         send, messages = _make_send_collector()
 
@@ -11973,7 +11973,7 @@ async def test_handle_streamable_http_server_scope_rbac_forbidden_on_get(monkeyp
     try:
         monkeypatch.setattr("mcpgateway.transports.streamablehttp_transport._check_streamable_permission", AsyncMock(return_value=False))
 
-        scope = _make_scope("/servers/abc-123-def/mcp", method="GET", headers=[])
+        scope = _make_scope("/v1/servers/abc-123-def/mcp", method="GET", headers=[])
         receive = _make_receive(orjson.dumps({}))
         send, messages = _make_send_collector()
 
@@ -12028,7 +12028,7 @@ async def test_handle_streamable_http_server_scope_checks_any_team_for_team_api_
         }
     )
     try:
-        scope = _make_scope("/servers/abc-123-def/mcp", method="POST", headers=[(b"mcp-session-id", b"sess-1")])
+        scope = _make_scope("/v1/servers/abc-123-def/mcp", method="POST", headers=[(b"mcp-session-id", b"sess-1")])
         receive = _make_receive(orjson.dumps({"jsonrpc": "2.0", "method": "tools/list", "params": {}, "id": "1"}))
         send, _messages = _make_send_collector()
 
@@ -12076,7 +12076,7 @@ async def test_streamable_http_auth_verify_exception_fallback_permissive(monkeyp
     monkeypatch.setattr("mcpgateway.transports.streamablehttp_transport.settings.proxy_user_header", "x-user")
     monkeypatch.setattr("mcpgateway.transports.streamablehttp_transport.settings.mcp_require_auth", False)
 
-    scope = _make_scope("/servers/abc-123/mcp", headers=[(b"authorization", b"Bearer bad-token")])
+    scope = _make_scope("/v1/servers/abc-123/mcp", headers=[(b"authorization", b"Bearer bad-token")])
     sent = []
 
     async def send(msg):
@@ -12136,7 +12136,7 @@ async def test_get_request_context_anonymous_user(monkeypatch):
     token = server_id_var.set("default_server_id")
 
     mock_request = MagicMock()
-    mock_request.url.path = "/servers/abc-def-123/mcp"
+    mock_request.url.path = "/v1/servers/abc-def-123/mcp"
     mock_request.headers = {}
     mock_request.cookies = {}
 
@@ -12269,7 +12269,7 @@ async def test_get_request_context_cookie_token_used(monkeypatch):
     token = server_id_var.set("default_server_id")
 
     mock_request = MagicMock()
-    mock_request.url.path = "/servers/aabbcc-112233/mcp"
+    mock_request.url.path = "/v1/servers/aabbcc-112233/mcp"
     mock_request.headers = {}  # No authorization header
     mock_request.cookies = {"jwt_token": "cookie-jwt-value"}
 
@@ -12315,7 +12315,7 @@ async def test_get_request_context_header_wins_over_cookie(monkeypatch):
     t = server_id_var.set("default_server_id")
 
     mock_request = MagicMock()
-    mock_request.url.path = "/servers/aabb-ccdd-1234/mcp"
+    mock_request.url.path = "/v1/servers/aabb-ccdd-1234/mcp"
     mock_request.headers = {"authorization": "Bearer header-token-value"}
     mock_request.cookies = {"jwt_token": "cookie-token-value"}
 
@@ -12544,7 +12544,7 @@ async def test_local_affinity_post_injects_server_id_when_params_missing(monkeyp
     server_id = "abc-123-def-456"
     # JSON-RPC body WITHOUT params key
     original_body = orjson.dumps({"jsonrpc": "2.0", "method": "tools/list", "id": 1})
-    scope = _make_scope(f"/servers/{server_id}/mcp", method="POST", headers=[(b"mcp-session-id", b"sess-1")])
+    scope = _make_scope(f"/v1/servers/{server_id}/mcp", method="POST", headers=[(b"mcp-session-id", b"sess-1")])
     receive = _make_receive(original_body)
     send, messages = _make_send_collector()
 
@@ -12908,7 +12908,7 @@ async def test_streamable_http_auth_rejects_unauthenticated_oauth_server(monkeyp
 
     monkeypatch.setattr("mcpgateway.transports.streamablehttp_transport.get_db", _make_fake_get_db(mock_db))
 
-    scope = _make_scope("/servers/abc123def/mcp")
+    scope = _make_scope("/v1/servers/abc123def/mcp")
     called = []
 
     async def send(msg):
@@ -12947,7 +12947,7 @@ async def test_streamable_http_auth_rejects_unauthenticated_oauth_server_on_get(
 
     monkeypatch.setattr("mcpgateway.transports.streamablehttp_transport.get_db", _make_fake_get_db(mock_db))
 
-    scope = _make_scope("/servers/abc123def/mcp", method="GET")
+    scope = _make_scope("/v1/servers/abc123def/mcp", method="GET")
     called = []
 
     async def send(msg):
@@ -12979,7 +12979,7 @@ async def test_streamable_http_auth_allows_unauthenticated_non_oauth_server(monk
 
     monkeypatch.setattr("mcpgateway.transports.streamablehttp_transport.get_db", _make_fake_get_db(mock_db))
 
-    scope = _make_scope("/servers/abc123def/mcp")
+    scope = _make_scope("/v1/servers/abc123def/mcp")
     called = []
 
     async def send(msg):
@@ -13012,7 +13012,7 @@ async def test_streamable_http_auth_allows_authenticated_oauth_server(monkeypatc
     mock_auth_cache = MagicMock()
     mock_auth_cache.get_team_membership_valid_sync.return_value = True
 
-    scope = _make_scope("/servers/abc123def/mcp", headers=[(b"authorization", b"Bearer valid-token")])
+    scope = _make_scope("/v1/servers/abc123def/mcp", headers=[(b"authorization", b"Bearer valid-token")])
     called = []
 
     async def send(msg):
@@ -13039,7 +13039,7 @@ async def test_streamable_http_auth_returns_503_on_db_failure(monkeypatch):
     mock_db.execute.side_effect = OperationalError("SELECT ...", {}, Exception("connection refused"))
     monkeypatch.setattr("mcpgateway.transports.streamablehttp_transport.get_db", _make_fake_get_db(mock_db))
 
-    scope = _make_scope("/servers/abc123def/mcp")
+    scope = _make_scope("/v1/servers/abc123def/mcp")
     called = []
 
     async def send(msg):
@@ -13353,13 +13353,13 @@ class TestBuildResourceMetadataUrl:
 
     def test_host_header(self):
         """Uses host header when present."""
-        scope = _make_scope("/servers/s1/mcp", headers=[(b"host", b"example.com")])
+        scope = _make_scope("/v1/servers/s1/mcp", headers=[(b"host", b"example.com")])
         url = tr._build_resource_metadata_url(scope, "s1")
         assert url == "https://example.com/.well-known/oauth-protected-resource/servers/s1/mcp"
 
     def test_x_forwarded_proto(self):
         """Respects x-forwarded-proto header over scope scheme."""
-        scope = _make_scope("/servers/s1/mcp", headers=[(b"host", b"example.com"), (b"x-forwarded-proto", b"http")])
+        scope = _make_scope("/v1/servers/s1/mcp", headers=[(b"host", b"example.com"), (b"x-forwarded-proto", b"http")])
         url = tr._build_resource_metadata_url(scope, "s1")
         assert url == "http://example.com/.well-known/oauth-protected-resource/servers/s1/mcp"
 
@@ -13368,9 +13368,9 @@ class TestBuildResourceMetadataUrl:
         scope: Scope = {
             "type": "http",
             "method": "POST",
-            "path": "/servers/s1/mcp",
+            "path": "/v1/servers/s1/mcp",
             "headers": [],
-            "modified_path": "/servers/s1/mcp",
+            "modified_path": "/v1/servers/s1/mcp",
             "scheme": "https",
             "server": ("10.0.0.1", 8443),
         }
@@ -13382,9 +13382,9 @@ class TestBuildResourceMetadataUrl:
         scope: Scope = {
             "type": "http",
             "method": "POST",
-            "path": "/servers/s1/mcp",
+            "path": "/v1/servers/s1/mcp",
             "headers": [],
-            "modified_path": "/servers/s1/mcp",
+            "modified_path": "/v1/servers/s1/mcp",
             "scheme": "https",
             "server": ("example.com", 443),
         }
@@ -13396,9 +13396,9 @@ class TestBuildResourceMetadataUrl:
         scope: Scope = {
             "type": "http",
             "method": "POST",
-            "path": "/servers/s1/mcp",
+            "path": "/v1/servers/s1/mcp",
             "headers": [],
-            "modified_path": "/servers/s1/mcp",
+            "modified_path": "/v1/servers/s1/mcp",
             "scheme": "http",
             "server": ("example.com", 80),
         }
@@ -13410,9 +13410,9 @@ class TestBuildResourceMetadataUrl:
         scope: Scope = {
             "type": "http",
             "method": "POST",
-            "path": "/servers/s1/mcp",
+            "path": "/v1/servers/s1/mcp",
             "headers": [],
-            "modified_path": "/servers/s1/mcp",
+            "modified_path": "/v1/servers/s1/mcp",
             "scheme": "http",
             "server": ("example.com", 443),
         }
@@ -13424,9 +13424,9 @@ class TestBuildResourceMetadataUrl:
         scope: Scope = {
             "type": "http",
             "method": "POST",
-            "path": "/servers/s1/mcp",
+            "path": "/v1/servers/s1/mcp",
             "headers": [(b"host", b"example.com")],
-            "modified_path": "/servers/s1/mcp",
+            "modified_path": "/v1/servers/s1/mcp",
             "scheme": "https",
             "server": ("example.com", 443),
             "root_path": "/gateway/v1",
@@ -13439,9 +13439,9 @@ class TestBuildResourceMetadataUrl:
         scope: Scope = {
             "type": "http",
             "method": "POST",
-            "path": "/servers/s1/mcp",
+            "path": "/v1/servers/s1/mcp",
             "headers": [(b"host", b"example.com")],
-            "modified_path": "/servers/s1/mcp",
+            "modified_path": "/v1/servers/s1/mcp",
             "scheme": "https",
             "server": ("example.com", 443),
             "root_path": "/gateway/v1/",
@@ -13451,7 +13451,7 @@ class TestBuildResourceMetadataUrl:
 
     def test_empty_root_path_no_prefix(self):
         """Empty root_path produces no prefix (default deployment)."""
-        scope = _make_scope("/servers/s1/mcp", headers=[(b"host", b"example.com")])
+        scope = _make_scope("/v1/servers/s1/mcp", headers=[(b"host", b"example.com")])
         url = tr._build_resource_metadata_url(scope, "s1")
         assert "//." not in url  # no double-slash before .well-known
         assert url == "https://example.com/.well-known/oauth-protected-resource/servers/s1/mcp"
@@ -13461,9 +13461,9 @@ class TestBuildResourceMetadataUrl:
         scope: Scope = {
             "type": "http",
             "method": "POST",
-            "path": "/servers/s1/mcp",
+            "path": "/v1/servers/s1/mcp",
             "headers": [],
-            "modified_path": "/servers/s1/mcp",
+            "modified_path": "/v1/servers/s1/mcp",
             "scheme": "https",
         }
         url = tr._build_resource_metadata_url(scope, "s1")
@@ -13474,9 +13474,9 @@ class TestBuildResourceMetadataUrl:
         scope: Scope = {
             "type": "http",
             "method": "POST",
-            "path": "/servers/s1/mcp",
+            "path": "/v1/servers/s1/mcp",
             "headers": [],
-            "modified_path": "/servers/s1/mcp",
+            "modified_path": "/v1/servers/s1/mcp",
             "scheme": "https",
             "server": ("::1", 4444),
         }
@@ -13488,9 +13488,9 @@ class TestBuildResourceMetadataUrl:
         scope: Scope = {
             "type": "http",
             "method": "POST",
-            "path": "/servers/s1/mcp",
+            "path": "/v1/servers/s1/mcp",
             "headers": [],
-            "modified_path": "/servers/s1/mcp",
+            "modified_path": "/v1/servers/s1/mcp",
             "scheme": "https",
             "server": ("::1", 443),
         }
@@ -13542,7 +13542,7 @@ async def test_streamable_http_auth_resets_oauth_checked_var(monkeypatch):
     # Simulate a stale True left over from a previous request on the same task context
     token = tr._oauth_checked_var.set(True)
     try:
-        scope = _make_scope("/servers/abc123def/mcp")
+        scope = _make_scope("/v1/servers/abc123def/mcp")
         called = []
 
         async def send(msg):
@@ -13698,7 +13698,7 @@ def test_build_resource_metadata_url_invalid_proto_fallback():
     }
     url = tr._build_resource_metadata_url(scope, "srv-1")
     assert url.startswith("https://")
-    assert "/servers/srv-1/mcp" in url
+    assert "/v1/servers/srv-1/mcp" in url
 
 
 def test_build_resource_metadata_url_exception_returns_empty():
@@ -13881,7 +13881,7 @@ async def test_streamable_http_auth_sqlalchemy_error_returns_503(monkeypatch):
     )
 
     scope = _make_scope(
-        "/servers/1/mcp",
+        "/v1/servers/1/mcp",
         headers=[(b"authorization", b"Bearer good-token")],
     )
     sent = []
@@ -13907,7 +13907,7 @@ async def test_streamable_http_auth_unexpected_exception_returns_401(monkeypatch
     monkeypatch.setattr("mcpgateway.transports.streamablehttp_transport.settings.mcp_require_auth", True)
 
     scope = _make_scope(
-        "/servers/1/mcp",
+        "/v1/servers/1/mcp",
         headers=[(b"authorization", b"Bearer bad-token")],
     )
     sent = []
@@ -14104,7 +14104,7 @@ async def test_get_request_context_scope_fallback_to_reauth(monkeypatch):
 
     mock_request = MagicMock()
     mock_request.scope = {}  # No _mcpgateway_context
-    mock_request.url.path = f"/servers/{valid_hex_id}/mcp"
+    mock_request.url.path = f"/v1/servers/{valid_hex_id}/mcp"
     mock_request.headers = {"authorization": "Bearer token"}
     mock_request.cookies = {}
 
@@ -14913,7 +14913,7 @@ async def test_session_manager_wrapper_rbac_gate_denies_missing_servers_use(monk
     wrapper = SessionManagerWrapper()
     await wrapper.initialize()
 
-    scope = _make_scope("/servers/123/mcp")
+    scope = _make_scope("/v1/servers/123/mcp")
     sent = []
 
     async def receive():
@@ -14979,7 +14979,7 @@ async def test_handle_streamable_http_server_not_found_returns_404(monkeypatch):
 
     token = user_context_var.set({"email": "dev@example.com", "teams": ["team-1"], "is_admin": False, "is_authenticated": True})
     try:
-        scope = _make_scope("/servers/abc123-def456-789/mcp", method="POST", headers=[(b"mcp-session-id", b"sess-1")])
+        scope = _make_scope("/v1/servers/abc123-def456-789/mcp", method="POST", headers=[(b"mcp-session-id", b"sess-1")])
         receive = _make_receive(orjson.dumps({"jsonrpc": "2.0", "method": "tools/list", "params": {}, "id": "1"}))
         send, messages = _make_send_collector()
 
@@ -15041,7 +15041,7 @@ async def test_handle_streamable_http_server_validation_db_error_returns_503(mon
 
     token = user_context_var.set({"email": "dev@example.com", "teams": ["team-1"], "is_admin": False, "is_authenticated": True})
     try:
-        scope = _make_scope("/servers/abc123-def456-789/mcp", method="POST", headers=[(b"mcp-session-id", b"sess-1")])
+        scope = _make_scope("/v1/servers/abc123-def456-789/mcp", method="POST", headers=[(b"mcp-session-id", b"sess-1")])
         receive = _make_receive(orjson.dumps({"jsonrpc": "2.0", "method": "tools/list", "params": {}, "id": "1"}))
         send, messages = _make_send_collector()
 
@@ -15143,20 +15143,20 @@ class TestServerIdDenyPaths:
     @pytest.mark.asyncio
     async def test_non_hex_server_id_xyz_returns_404(self):
         """Non-hex server ID 'xyz' must return 404, not all tools."""
-        status, body = await self._run_request("/servers/xyz/mcp")
+        status, body = await self._run_request("/v1/servers/xyz/mcp")
         assert status == 404
         assert "not found" in body["detail"].lower() or "invalid" in body["detail"].lower()
 
     @pytest.mark.asyncio
     async def test_non_hex_server_id_with_letters_returns_404(self):
         """Server ID containing non-hex letters (g-z) must return 404."""
-        status, body = await self._run_request("/servers/my-server-name/mcp")
+        status, body = await self._run_request("/v1/servers/my-server-name/mcp")
         assert status == 404
 
     @pytest.mark.asyncio
     async def test_url_encoded_special_chars_returns_404(self):
         """URL-encoded special characters in server ID must return 404."""
-        status, body = await self._run_request("/servers/hello%20world/mcp")
+        status, body = await self._run_request("/v1/servers/hello%20world/mcp")
         assert status == 404
 
     # --- Empty / malformed server ID ---
@@ -15164,7 +15164,7 @@ class TestServerIdDenyPaths:
     @pytest.mark.asyncio
     async def test_empty_server_id_returns_404(self):
         """Empty server ID segment (/servers//mcp) must return 404."""
-        status, body = await self._run_request("/servers//mcp")
+        status, body = await self._run_request("/v1/servers//mcp")
         assert status == 404
 
     # --- Path traversal attempts ---
@@ -15172,7 +15172,7 @@ class TestServerIdDenyPaths:
     @pytest.mark.asyncio
     async def test_path_traversal_returns_404(self):
         """Path traversal in server ID must return 404."""
-        status, body = await self._run_request("/servers/../servers/xyz/mcp")
+        status, body = await self._run_request("/v1/servers/../servers/xyz/mcp")
         assert status == 404
 
     # --- Hex-format IDs that don't exist in DB ---
@@ -15180,21 +15180,21 @@ class TestServerIdDenyPaths:
     @pytest.mark.asyncio
     async def test_hex_nonexistent_server_deadbeef_returns_404(self):
         """Hex-format server ID not in database must return 404."""
-        status, body = await self._run_request("/servers/deadbeef/mcp")
+        status, body = await self._run_request("/v1/servers/deadbeef/mcp")
         assert status == 404
         assert body["detail"] == "Server not found"
 
     @pytest.mark.asyncio
     async def test_hex_nonexistent_server_all_zeros_returns_404(self):
         """All-zero UUID-format server ID not in database must return 404."""
-        status, body = await self._run_request("/servers/00000000-0000-0000-0000-000000000000/mcp")
+        status, body = await self._run_request("/v1/servers/00000000-0000-0000-0000-000000000000/mcp")
         assert status == 404
         assert body["detail"] == "Server not found"
 
     @pytest.mark.asyncio
     async def test_uppercase_hex_nonexistent_returns_404(self):
         """Uppercase hex server ID not in database must return 404."""
-        status, body = await self._run_request("/servers/AABB/mcp")
+        status, body = await self._run_request("/v1/servers/AABB/mcp")
         assert status == 404
         assert body["detail"] == "Server not found"
 

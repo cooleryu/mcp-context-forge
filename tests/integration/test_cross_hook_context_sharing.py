@@ -88,7 +88,7 @@ class TestCrossHookContextSharing:
         """
         # Make a request that triggers both HTTP_PRE_REQUEST and HTTP_AUTH_CHECK_PERMISSION
         response = test_client_with_plugins.get(
-            "/tools",
+            "/v1/tools",
             headers={"Authorization": "Bearer test-token"}
         )
 
@@ -174,7 +174,7 @@ class TestCrossHookContextSharing:
 
         # Make a request to read the resource
         response = test_client_with_plugins.get(
-            f"/resources/{created.id}",
+            f"/v1/resources/{created.id}",
             headers={"Authorization": "Bearer test-token"}
         )
 
@@ -212,7 +212,7 @@ class TestCrossHookContextSharing:
 
         # Make a request to get the prompt
         response = test_client_with_plugins.get(
-            f"/prompts/{created.name}",
+            f"/v1/prompts/{created.name}",
             headers={"Authorization": "Bearer test-token"}
         )
 
@@ -229,7 +229,7 @@ class TestCrossHookContextSharing:
         """
         # Make a request that triggers multiple hooks
         response = test_client_with_plugins.get(
-            "/tools",
+            "/v1/tools",
             headers={"Authorization": "Bearer test-token"}
         )
 

@@ -154,7 +154,7 @@ class TestRBACOwnershipHTTP:
 
         # Attempt to delete tool owned by user-a@example.com
         response = client.delete(
-            "/tools/tool-123",
+            "/v1/tools/tool-123",
             headers={"Authorization": "Bearer test-token"}
         )
 
@@ -191,7 +191,7 @@ class TestRBACOwnershipHTTP:
 
         # Attempt to update tool owned by user-a@example.com
         response = client.put(
-            "/tools/tool-123",
+            "/v1/tools/tool-123",
             json={"name": "updated-tool"},
             headers={"Authorization": "Bearer test-token"}
         )
@@ -230,7 +230,7 @@ class TestRBACOwnershipHTTP:
 
         # Delete own server
         response = client.delete(
-            "/servers/server-123",
+            "/v1/servers/server-123",
             headers={"Authorization": "Bearer test-token"}
         )
 
@@ -268,7 +268,7 @@ class TestRBACOwnershipHTTP:
 
         # Attempt to delete resource owned by user-a@example.com (use resource ID, not URI)
         response = client.delete(
-            "/resources/resource-123",
+            "/v1/resources/resource-123",
             headers={"Authorization": "Bearer test-token"}
         )
 
@@ -306,7 +306,7 @@ class TestRBACOwnershipHTTP:
 
         # Delete team member's gateway as team admin
         response = client.delete(
-            "/gateways/gateway-123",
+            "/v1/gateways/gateway-123",
             headers={"Authorization": "Bearer test-token"}
         )
 
@@ -343,7 +343,7 @@ class TestRBACOwnershipHTTP:
 
         # Attempt to update prompt owned by team owner
         response = client.put(
-            "/prompts/test-prompt",
+            "/v1/prompts/test-prompt",
             json={"description": "updated"},
             headers={"Authorization": "Bearer test-token"}
         )
@@ -381,7 +381,7 @@ class TestRBACOwnershipHTTP:
 
         # Attempt to delete A2A agent owned by user-a@example.com
         response = client.delete(
-            "/a2a/agent-123",
+            "/v1/a2a/agent-123",
             headers={"Authorization": "Bearer test-token"}
         )
 
@@ -465,7 +465,7 @@ class TestTeamIdFallbackHTTP:
 
         # Call GET /gateways WITHOUT team_id parameter
         response = client.get(
-            "/gateways",
+            "/v1/gateways",
             headers={"Authorization": "Bearer test-token"}
         )
 
@@ -533,7 +533,7 @@ class TestTeamIdFallbackHTTP:
 
         # Call GET /gateways with DIFFERENT team_id parameter
         response = client.get(
-            "/gateways?team_id=team-Y",  # Mismatched team
+            "/v1/gateways?team_id=team-Y",  # Mismatched team
             headers={"Authorization": "Bearer test-token"}
         )
 
@@ -594,7 +594,7 @@ class TestTeamIdFallbackHTTP:
 
         # Call GET /servers - endpoint doesn't accept team_id parameter
         response = client.get(
-            "/servers",
+            "/v1/servers",
             headers={"Authorization": "Bearer test-token"}
         )
 

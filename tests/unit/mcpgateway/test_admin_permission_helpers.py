@@ -77,13 +77,13 @@ class TestValidateSectionPermissions:
     """Test validate_section_permissions function."""
 
     @patch('mcpgateway.admin.SECTION_PERMISSIONS', {'overview': None, 'tools': 'tools.read'})
-    @patch('mcpgateway.admin._SECTION_TO_ROUTE_PATH', {'overview': None, 'tools': '/admin/tools'})
+    @patch('mcpgateway.admin._SECTION_TO_ROUTE_PATH', {'overview': None, 'tools': '/v1/admin/tools'})
     @patch('mcpgateway.admin.LOGGER')
     def test_validate_section_permissions_with_none_route_path(self, mock_logger):
         """Test validate_section_permissions with None route_path (lines 307-312)."""
         # Create a route that matches the tools path
         route = MagicMock()
-        route.path = '/admin/tools'
+        route.path = '/v1/admin/tools'
         route.endpoint = MagicMock(spec=[])
         route.endpoint._required_permission = 'tools.read'
 
@@ -97,18 +97,18 @@ class TestValidateSectionPermissions:
         assert "validation passed" in mock_logger.info.call_args[0][0]
 
     @patch('mcpgateway.admin.SECTION_PERMISSIONS', {'tools': 'tools.read', 'servers': 'servers.read'})
-    @patch('mcpgateway.admin._SECTION_TO_ROUTE_PATH', {'tools': '/admin/tools', 'servers': '/admin/servers'})
+    @patch('mcpgateway.admin._SECTION_TO_ROUTE_PATH', {'tools': '/v1/admin/tools', 'servers': '/v1/admin/servers'})
     @patch('mcpgateway.admin.LOGGER')
     def test_validate_section_permissions_with_mismatches(self, mock_logger):
         """Test validate_section_permissions with mismatches raises ValueError in test env."""
         # Create routes with mismatched permissions
         route1 = MagicMock()
-        route1.path = '/admin/tools'
+        route1.path = '/v1/admin/tools'
         route1.endpoint = MagicMock()
         route1.endpoint._required_permission = 'tools.write'  # Mismatch!
 
         route2 = MagicMock()
-        route2.path = '/admin/servers'
+        route2.path = '/v1/admin/servers'
         route2.endpoint = MagicMock()
         route2.endpoint._required_permission = None  # Mismatch!
 
@@ -126,17 +126,17 @@ class TestValidateSectionPermissions:
         assert "servers" in error_msg
 
     @patch('mcpgateway.admin.SECTION_PERMISSIONS', {'tools': 'tools.read', 'servers': 'servers.read'})
-    @patch('mcpgateway.admin._SECTION_TO_ROUTE_PATH', {'tools': '/admin/tools', 'servers': '/admin/servers'})
+    @patch('mcpgateway.admin._SECTION_TO_ROUTE_PATH', {'tools': '/v1/admin/tools', 'servers': '/v1/admin/servers'})
     @patch('mcpgateway.admin.LOGGER')
     def test_validate_section_permissions_production_warns_on_mismatch(self, mock_logger):
         """Test validate_section_permissions logs warnings in production (non-test) env."""
         route1 = MagicMock()
-        route1.path = '/admin/tools'
+        route1.path = '/v1/admin/tools'
         route1.endpoint = MagicMock()
         route1.endpoint._required_permission = 'tools.write'  # Mismatch!
 
         route2 = MagicMock()
-        route2.path = '/admin/servers'
+        route2.path = '/v1/admin/servers'
         route2.endpoint = MagicMock()
         route2.endpoint._required_permission = 'servers.read'
 
@@ -153,12 +153,12 @@ class TestValidateSectionPermissions:
         assert "mapping needs updating" in mock_logger.warning.call_args_list[1][0][0]
 
     @patch('mcpgateway.admin.SECTION_PERMISSIONS', {'tools': 'tools.read'})
-    @patch('mcpgateway.admin._SECTION_TO_ROUTE_PATH', {'tools': '/admin/tools'})
+    @patch('mcpgateway.admin._SECTION_TO_ROUTE_PATH', {'tools': '/v1/admin/tools'})
     @patch('mcpgateway.admin.LOGGER')
     def test_validate_section_permissions_all_match(self, mock_logger):
         """Test validate_section_permissions when all permissions match."""
         route = MagicMock()
-        route.path = '/admin/tools'
+        route.path = '/v1/admin/tools'
         route.endpoint = MagicMock()
         route.endpoint._required_permission = 'tools.read'
 

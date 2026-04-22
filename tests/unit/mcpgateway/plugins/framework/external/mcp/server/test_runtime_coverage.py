@@ -30,7 +30,7 @@ class TestModuleLevelTools:
         ("path", "expected"),
         [
             ("/health", False),
-            ("/metrics/prometheus/", False),
+            ("/v1/metrics/prometheus/", False),
             ("/mcp", True),
         ],
     )
@@ -324,7 +324,7 @@ class TestStartHealthCheckServerEndpoints:
                     if getattr(route, "path", None) == "/health":
                         resp = await route.endpoint(None)
                         called["health"] = resp is not None
-                    if getattr(route, "path", None) == "/metrics/prometheus":
+                    if getattr(route, "path", None) == "/v1/metrics/prometheus":
                         resp = await route.endpoint(None)
                         called["metrics"] = resp is not None
 
@@ -350,7 +350,7 @@ class TestStartHealthCheckServerEndpoints:
 
             async def serve(self):
                 for route in self.config.app.routes:
-                    if getattr(route, "path", None) == "/metrics/prometheus":
+                    if getattr(route, "path", None) == "/v1/metrics/prometheus":
                         try:
                             resp = await route.endpoint(None)
                         except TypeError:
@@ -391,7 +391,7 @@ class TestRunStreamableHTTPAsyncEndpoints:
                 for route in self.config.app.routes:
                     if getattr(route, "path", None) == "/health":
                         called["health"] = (await route.endpoint(None)) is not None
-                    if getattr(route, "path", None) == "/metrics/prometheus":
+                    if getattr(route, "path", None) == "/v1/metrics/prometheus":
                         called["metrics"] = (await route.endpoint(None)) is not None
 
         monkeypatch.setattr(runtime.uvicorn, "Config", lambda **kwargs: SimpleNamespace(**kwargs))
@@ -420,7 +420,7 @@ class TestRunStreamableHTTPAsyncEndpoints:
 
             async def serve(self):
                 for route in self.config.app.routes:
-                    if getattr(route, "path", None) == "/metrics/prometheus":
+                    if getattr(route, "path", None) == "/v1/metrics/prometheus":
                         try:
                             resp = await route.endpoint(None)
                         except TypeError:

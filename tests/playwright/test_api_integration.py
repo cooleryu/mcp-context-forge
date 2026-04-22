@@ -41,13 +41,13 @@ def json_param_tool(api_request_context: APIRequestContext):
             },
         }
     }
-    resp = api_request_context.post("/tools/", data=payload)
+    resp = api_request_context.post("/v1/tools/", data=payload)
     assert resp.ok, f"Failed to create test tool: {resp.text()}"
     tool_id = resp.json()["id"]
 
     yield tool_name
 
-    api_request_context.delete(f"/tools/{tool_id}")
+    api_request_context.delete(f"/v1/tools/{tool_id}")
 
 
 def _close_and_reopen_test_modal(page: Page, test_btn: Locator) -> None:
@@ -187,7 +187,7 @@ class TestAPIIntegration:
         jwt_cookie = next((c for c in cookies if c["name"] == "jwt_token"), None)
         assert jwt_cookie is not None
         response = api_request_context.post(
-            "/protocol/initialize",
+            "/v1/protocol/initialize",
             headers={"Authorization": f"Bearer {jwt_cookie['value']}"},
             data={"protocolVersion": "2024-11-05", "capabilities": {}, "clientInfo": {"name": "test-client", "version": "1.0.0"}},
         )

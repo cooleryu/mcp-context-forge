@@ -45,7 +45,7 @@ class UserPopulator(BasePopulator):
             # Create user via admin endpoint
             try:
                 resp = await self.client.post(
-                    "/auth/email/admin/users",
+                    "/v1/auth/email/admin/users",
                     json={
                         "email": email,
                         "password": DEFAULT_PASSWORD,
@@ -76,7 +76,7 @@ class UserPopulator(BasePopulator):
             # Login to obtain user-scoped JWT
             try:
                 login_resp = await self.client.post(
-                    "/auth/email/login",
+                    "/v1/auth/email/login",
                     json={"email": email, "password": DEFAULT_PASSWORD},
                     expected_status=[200],
                 )

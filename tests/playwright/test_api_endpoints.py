@@ -28,7 +28,7 @@ class TestAPIEndpoints:
 
     def test_list_servers(self, api_request_context: APIRequestContext):
         """Test list servers endpoint."""
-        response = api_request_context.get("/servers")
+        response = api_request_context.get("/v1/servers")
         assert response.ok
 
         servers = response.json()
@@ -36,7 +36,7 @@ class TestAPIEndpoints:
 
     def test_list_tools(self, api_request_context: APIRequestContext):
         """Test list tools endpoint."""
-        response = api_request_context.get("/tools")
+        response = api_request_context.get("/v1/tools")
         assert response.ok
 
         tools = response.json()

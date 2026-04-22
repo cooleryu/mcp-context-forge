@@ -49,7 +49,7 @@ def _ws_url(path: str) -> str:
 @pytest.fixture
 def public_server_id(admin_api: APIRequestContext) -> str:
     response = admin_api.post(
-        "/servers",
+        "/v1/servers",
         data={
             "server": {"name": f"transport-public-{uuid.uuid4().hex[:8]}", "description": "transport auth matrix"},
             "team_id": None,
@@ -62,7 +62,7 @@ def public_server_id(admin_api: APIRequestContext) -> str:
     server_id = response.json()["id"]
     yield server_id
     with suppress(Exception):
-        admin_api.delete(f"/servers/{server_id}")
+        admin_api.delete(f"/v1/servers/{server_id}")
 
 
 class TestMCPTransportAuthMatrix:
@@ -70,7 +70,7 @@ class TestMCPTransportAuthMatrix:
 
     def test_streamable_http_unauthenticated_behavior_matches_mode(self, anon_api: APIRequestContext, public_server_id: str):
         response = anon_api.post(
-            f"/servers/{public_server_id}/mcp",
+            f"/v1/servers/{public_server_id}/mcp",
             data={"jsonrpc": "2.0", "id": "1", "method": "ping", "params": {}},
         )
 
@@ -87,7 +87,7 @@ class TestMCPTransportAuthMatrix:
         ctx = _api_context(playwright, _make_admin_jwt())
         try:
             response = ctx.post(
-                f"/servers/{public_server_id}/mcp",
+                f"/v1/servers/{public_server_id}/mcp",
                 data={"jsonrpc": "2.0", "id": "2", "method": "ping", "params": {}},
             )
         finally:
@@ -99,7 +99,7 @@ class TestMCPTransportAuthMatrix:
 
     def test_sse_message_endpoint_requires_auth(self, playwright: Playwright, anon_api: APIRequestContext, public_server_id: str):
         unauth_resp = anon_api.post(
-            f"/servers/{public_server_id}/message?session_id=security-test",
+            f"/v1/servers/{public_server_id}/message?session_id=security-test",
             data={"jsonrpc": "2.0", "id": "1", "method": "ping", "params": {}},
         )
         assert unauth_resp.status in (401, 403), f"SSE message endpoint should require auth, got {unauth_resp.status}: {unauth_resp.text()}"
@@ -107,7 +107,7 @@ class TestMCPTransportAuthMatrix:
         auth_ctx = _api_context(playwright, _make_admin_jwt())
         try:
             auth_resp = auth_ctx.post(
-                f"/servers/{public_server_id}/message?session_id=security-test",
+                f"/v1/servers/{public_server_id}/message?session_id=security-test",
                 data={"jsonrpc": "2.0", "id": "2", "method": "ping", "params": {}},
             )
         finally:

@@ -869,7 +869,7 @@ class HealthCheckUser(BaseUser):
     @tag("health")
     def metrics_endpoint(self):
         """Check Prometheus metrics endpoint."""
-        with self.client.get("/metrics", headers=self.auth_headers, name="/metrics", catch_response=True) as response:
+        with self.client.get("/v1/metrics", headers=self.auth_headers, name="/v1/metrics", catch_response=True) as response:
             self._validate_status(response)
 
     @task(1)
@@ -894,56 +894,56 @@ class ReadOnlyAPIUser(BaseUser):
     @tag("api", "tools")
     def list_tools(self):
         """List all tools."""
-        with self.client.get("/tools", headers=self.auth_headers, name="/tools", catch_response=True) as response:
+        with self.client.get("/v1/tools", headers=self.auth_headers, name="/v1/tools", catch_response=True) as response:
             self._validate_json_response(response)
 
     @task(8)
     @tag("api", "servers")
     def list_servers(self):
         """List all servers."""
-        with self.client.get("/servers", headers=self.auth_headers, name="/servers", catch_response=True) as response:
+        with self.client.get("/v1/servers", headers=self.auth_headers, name="/v1/servers", catch_response=True) as response:
             self._validate_json_response(response)
 
     @task(6)
     @tag("api", "gateways")
     def list_gateways(self):
         """List all gateways."""
-        with self.client.get("/gateways", headers=self.auth_headers, name="/gateways", catch_response=True) as response:
+        with self.client.get("/v1/gateways", headers=self.auth_headers, name="/v1/gateways", catch_response=True) as response:
             self._validate_json_response(response)
 
     @task(5)
     @tag("api", "resources")
     def list_resources(self):
         """List all resources."""
-        with self.client.get("/resources", headers=self.auth_headers, name="/resources", catch_response=True) as response:
+        with self.client.get("/v1/resources", headers=self.auth_headers, name="/v1/resources", catch_response=True) as response:
             self._validate_json_response(response)
 
     @task(5)
     @tag("api", "prompts")
     def list_prompts(self):
         """List all prompts."""
-        with self.client.get("/prompts", headers=self.auth_headers, name="/prompts", catch_response=True) as response:
+        with self.client.get("/v1/prompts", headers=self.auth_headers, name="/v1/prompts", catch_response=True) as response:
             self._validate_json_response(response)
 
     @task(4)
     @tag("api", "a2a")
     def list_a2a_agents(self):
         """List A2A agents."""
-        with self.client.get("/a2a", headers=self.auth_headers, name="/a2a", catch_response=True) as response:
+        with self.client.get("/v1/a2a", headers=self.auth_headers, name="/v1/a2a", catch_response=True) as response:
             self._validate_json_response(response)
 
     @task(3)
     @tag("api", "tags")
     def list_tags(self):
         """List all tags."""
-        with self.client.get("/tags", headers=self.auth_headers, name="/tags", catch_response=True) as response:
+        with self.client.get("/v1/tags", headers=self.auth_headers, name="/v1/tags", catch_response=True) as response:
             self._validate_json_response(response)
 
     @task(2)
     @tag("api", "metrics")
     def get_metrics(self):
         """Get application metrics."""
-        with self.client.get("/metrics", headers=self.auth_headers, name="/metrics [api]", catch_response=True) as response:
+        with self.client.get("/v1/metrics", headers=self.auth_headers, name="/metrics [api]", catch_response=True) as response:
             self._validate_status(response)
 
     @task(3)
@@ -953,9 +953,9 @@ class ReadOnlyAPIUser(BaseUser):
         if TOOL_IDS:
             tool_id = random.choice(TOOL_IDS)
             with self.client.get(
-                f"/tools/{tool_id}",
+                f"/v1/tools/{tool_id}",
                 headers=self.auth_headers,
-                name="/tools/[id]",
+                name="/v1/tools/[id]",
                 catch_response=True,
             ) as response:
                 # 200=Success, 404=Not found (acceptable)
@@ -968,9 +968,9 @@ class ReadOnlyAPIUser(BaseUser):
         if SERVER_IDS:
             server_id = random.choice(SERVER_IDS)
             with self.client.get(
-                f"/servers/{server_id}",
+                f"/v1/servers/{server_id}",
                 headers=self.auth_headers,
-                name="/servers/[id]",
+                name="/v1/servers/[id]",
                 catch_response=True,
             ) as response:
                 # 200=Success, 404=Not found (acceptable)
@@ -983,9 +983,9 @@ class ReadOnlyAPIUser(BaseUser):
         if GATEWAY_IDS:
             gateway_id = random.choice(GATEWAY_IDS)
             with self.client.get(
-                f"/gateways/{gateway_id}",
+                f"/v1/gateways/{gateway_id}",
                 headers=self.auth_headers,
-                name="/gateways/[id]",
+                name="/v1/gateways/[id]",
                 catch_response=True,
             ) as response:
                 self._validate_json_response(response, allowed_codes=[200, 404])
@@ -995,9 +995,9 @@ class ReadOnlyAPIUser(BaseUser):
     def list_roots(self):
         """List roots."""
         with self.client.get(
-            "/roots",
+            "/v1/roots",
             headers=self.auth_headers,
-            name="/roots",
+            name="/v1/roots",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -1009,9 +1009,9 @@ class ReadOnlyAPIUser(BaseUser):
         if RESOURCE_IDS:
             resource_id = random.choice(RESOURCE_IDS)
             with self.client.get(
-                f"/resources/{resource_id}",
+                f"/v1/resources/{resource_id}",
                 headers=self.auth_headers,
-                name="/resources/[id]",
+                name="/v1/resources/[id]",
                 catch_response=True,
             ) as response:
                 # 200=Success, 403=Forbidden (read-only), 404=Not found
@@ -1024,9 +1024,9 @@ class ReadOnlyAPIUser(BaseUser):
         if PROMPT_IDS:
             prompt_id = random.choice(PROMPT_IDS)
             with self.client.get(
-                f"/prompts/{prompt_id}",
+                f"/v1/prompts/{prompt_id}",
                 headers=self.auth_headers,
-                name="/prompts/[id]",
+                name="/v1/prompts/[id]",
                 catch_response=True,
             ) as response:
                 # 200=Success, 403=Forbidden (read-only), 404=Not found
@@ -1038,7 +1038,7 @@ class ReadOnlyAPIUser(BaseUser):
         """Get tools for a specific server."""
         if SERVER_IDS:
             server_id = random.choice(SERVER_IDS)
-            with self.client.get(f"/servers/{server_id}/tools", headers=self.auth_headers, name="/servers/[id]/tools", catch_response=True) as response:
+            with self.client.get(f"/v1/servers/{server_id}/tools", headers=self.auth_headers, name="/v1/servers/[id]/tools", catch_response=True) as response:
                 self._validate_json_response(response, allowed_codes=[200, 404])
 
     @task(2)
@@ -1047,7 +1047,7 @@ class ReadOnlyAPIUser(BaseUser):
         """Get resources for a specific server."""
         if SERVER_IDS:
             server_id = random.choice(SERVER_IDS)
-            with self.client.get(f"/servers/{server_id}/resources", headers=self.auth_headers, name="/servers/[id]/resources", catch_response=True) as response:
+            with self.client.get(f"/v1/servers/{server_id}/resources", headers=self.auth_headers, name="/v1/servers/[id]/resources", catch_response=True) as response:
                 self._validate_json_response(response, allowed_codes=[200, 404])
 
     @task(1)
@@ -1091,49 +1091,49 @@ class AdminUIUser(BaseUser):
     @tag("admin", "dashboard")
     def admin_dashboard(self):
         """Load admin dashboard."""
-        with self.client.get("/admin/", headers=self.admin_headers, name="/admin/", catch_response=True) as response:
+        with self.client.get("/v1/admin/", headers=self.admin_headers, name="/v1/admin/", catch_response=True) as response:
             self._validate_html_response(response)
 
     @task(8)
     @tag("admin", "tools")
     def admin_tools_page(self):
         """Load tools list (JSON API)."""
-        with self.client.get("/admin/tools", headers=self.admin_headers, name="/admin/tools", catch_response=True) as response:
+        with self.client.get("/v1/admin/tools", headers=self.admin_headers, name="/v1/admin/tools", catch_response=True) as response:
             self._validate_json_response(response)
 
     @task(7)
     @tag("admin", "servers")
     def admin_servers_page(self):
         """Load servers list (JSON API)."""
-        with self.client.get("/admin/servers", headers=self.admin_headers, name="/admin/servers", catch_response=True) as response:
+        with self.client.get("/v1/admin/servers", headers=self.admin_headers, name="/v1/admin/servers", catch_response=True) as response:
             self._validate_json_response(response)
 
     @task(6)
     @tag("admin", "gateways")
     def admin_gateways_page(self):
         """Load gateways list (JSON API)."""
-        with self.client.get("/admin/gateways", headers=self.admin_headers, name="/admin/gateways", catch_response=True) as response:
+        with self.client.get("/v1/admin/gateways", headers=self.admin_headers, name="/v1/admin/gateways", catch_response=True) as response:
             self._validate_json_response(response)
 
     @task(5)
     @tag("admin", "resources")
     def admin_resources_page(self):
         """Load resources list (JSON API)."""
-        with self.client.get("/admin/resources", headers=self.admin_headers, name="/admin/resources", catch_response=True) as response:
+        with self.client.get("/v1/admin/resources", headers=self.admin_headers, name="/v1/admin/resources", catch_response=True) as response:
             self._validate_json_response(response)
 
     @task(5)
     @tag("admin", "prompts")
     def admin_prompts_page(self):
         """Load prompts list (JSON API)."""
-        with self.client.get("/admin/prompts", headers=self.admin_headers, name="/admin/prompts", catch_response=True) as response:
+        with self.client.get("/v1/admin/prompts", headers=self.admin_headers, name="/v1/admin/prompts", catch_response=True) as response:
             self._validate_json_response(response)
 
     @task(4)
     @tag("admin", "a2a")
     def admin_a2a_list(self):
         """Load A2A agents list (JSON API)."""
-        with self.client.get("/admin/a2a", headers=self.auth_headers, name="/admin/a2a", catch_response=True) as response:
+        with self.client.get("/v1/admin/a2a", headers=self.auth_headers, name="/v1/admin/a2a", catch_response=True) as response:
             self._validate_json_response(response)
 
     @task(3)
@@ -1141,9 +1141,9 @@ class AdminUIUser(BaseUser):
     def admin_performance(self):
         """Load performance stats (if enabled)."""
         with self.client.get(
-            "/admin/performance/stats",
+            "/v1/admin/performance/stats",
             headers={**self.admin_headers, "HX-Request": "true"},
-            name="/admin/performance/stats",
+            name="/v1/admin/performance/stats",
             catch_response=True,
         ) as response:
             # 404 is acceptable if performance tracking is disabled
@@ -1153,35 +1153,35 @@ class AdminUIUser(BaseUser):
     @tag("admin", "logs")
     def admin_logs(self):
         """Load logs (JSON API)."""
-        with self.client.get("/admin/logs", headers=self.auth_headers, name="/admin/logs", catch_response=True) as response:
+        with self.client.get("/v1/admin/logs", headers=self.auth_headers, name="/v1/admin/logs", catch_response=True) as response:
             self._validate_json_response(response)
 
     @task(1)
     @tag("admin", "events")
     def admin_events(self):
         """Load admin events stream metadata."""
-        with self.client.get("/admin/events", headers=self.auth_headers, name="/admin/events", catch_response=True) as response:
+        with self.client.get("/v1/admin/events", headers=self.auth_headers, name="/v1/admin/events", catch_response=True) as response:
             self._validate_json_response(response, allowed_codes=[200, 401, 403, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
 
     @task(2)
     @tag("admin", "config")
     def admin_config_settings(self):
         """Load config settings (JSON API)."""
-        with self.client.get("/admin/config/settings", headers=self.auth_headers, name="/admin/config/settings", catch_response=True) as response:
+        with self.client.get("/v1/admin/config/settings", headers=self.auth_headers, name="/v1/admin/config/settings", catch_response=True) as response:
             self._validate_json_response(response)
 
     @task(2)
     @tag("admin", "metrics")
     def admin_metrics(self):
         """Load metrics (JSON API)."""
-        with self.client.get("/admin/metrics", headers=self.admin_headers, name="/admin/metrics", catch_response=True) as response:
+        with self.client.get("/v1/admin/metrics", headers=self.admin_headers, name="/v1/admin/metrics", catch_response=True) as response:
             self._validate_json_response(response, allowed_codes=[200, 500])
 
     @task(2)
     @tag("admin", "teams")
     def admin_teams(self):
         """Load teams management page."""
-        with self.client.get("/admin/teams", headers=self.admin_headers, name="/admin/teams", catch_response=True) as response:
+        with self.client.get("/v1/admin/teams", headers=self.admin_headers, name="/v1/admin/teams", catch_response=True) as response:
             self._validate_html_response(response)
 
     @task(2)
@@ -1189,14 +1189,14 @@ class AdminUIUser(BaseUser):
     def admin_users(self):
         """Load users management page."""
         headers = {**self.admin_headers, "HX-Request": "true"}
-        with self.client.get("/admin/users/partial", headers=headers, name="/admin/users/partial", catch_response=True) as response:
+        with self.client.get("/v1/admin/users/partial", headers=headers, name="/v1/admin/users/partial", catch_response=True) as response:
             self._validate_html_response(response)
 
     @task(1)
     @tag("admin", "export")
     def admin_export_config(self):
         """Load export configuration (JSON API)."""
-        with self.client.get("/admin/export/configuration", headers=self.admin_headers, name="/admin/export/configuration", catch_response=True) as response:
+        with self.client.get("/v1/admin/export/configuration", headers=self.admin_headers, name="/v1/admin/export/configuration", catch_response=True) as response:
             self._validate_json_response(response)
 
     @task(1)
@@ -1204,7 +1204,7 @@ class AdminUIUser(BaseUser):
     def admin_tools_partial(self):
         """Fetch tools partial via HTMX."""
         headers = {**self.admin_headers, "HX-Request": "true"}
-        with self.client.get("/admin/tools/partial", headers=headers, name="/admin/tools/partial", catch_response=True) as response:
+        with self.client.get("/v1/admin/tools/partial", headers=headers, name="/v1/admin/tools/partial", catch_response=True) as response:
             self._validate_html_response(response)
 
     @task(1)
@@ -1212,7 +1212,7 @@ class AdminUIUser(BaseUser):
     def admin_resources_partial(self):
         """Fetch resources partial via HTMX."""
         headers = {**self.admin_headers, "HX-Request": "true"}
-        with self.client.get("/admin/resources/partial", headers=headers, name="/admin/resources/partial", catch_response=True) as response:
+        with self.client.get("/v1/admin/resources/partial", headers=headers, name="/v1/admin/resources/partial", catch_response=True) as response:
             self._validate_html_response(response)
 
     @task(1)
@@ -1220,7 +1220,7 @@ class AdminUIUser(BaseUser):
     def admin_prompts_partial(self):
         """Fetch prompts partial via HTMX."""
         headers = {**self.admin_headers, "HX-Request": "true"}
-        with self.client.get("/admin/prompts/partial", headers=headers, name="/admin/prompts/partial", catch_response=True) as response:
+        with self.client.get("/v1/admin/prompts/partial", headers=headers, name="/v1/admin/prompts/partial", catch_response=True) as response:
             self._validate_html_response(response)
 
     @task(1)
@@ -1228,7 +1228,7 @@ class AdminUIUser(BaseUser):
     def admin_metrics_partial(self):
         """Fetch metrics partial via HTMX."""
         headers = {**self.admin_headers, "HX-Request": "true"}
-        with self.client.get("/admin/metrics/partial", headers=headers, name="/admin/metrics/partial", catch_response=True) as response:
+        with self.client.get("/v1/admin/metrics/partial", headers=headers, name="/v1/admin/metrics/partial", catch_response=True) as response:
             self._validate_html_response(response)
 
     @task(1)
@@ -1236,7 +1236,7 @@ class AdminUIUser(BaseUser):
     def admin_htmx_refresh(self):
         """Simulate HTMX partial refresh."""
         headers = {**self.admin_headers, "HX-Request": "true"}
-        endpoint = random.choice(["/admin/tools/partial", "/admin/resources/partial", "/admin/prompts/partial"])
+        endpoint = random.choice(["/v1/admin/tools/partial", "/v1/admin/resources/partial", "/v1/admin/prompts/partial"])
         with self.client.get(endpoint, headers=headers, name=f"{endpoint} [htmx]", catch_response=True) as response:
             self._validate_html_response(response)
 
@@ -1371,10 +1371,10 @@ class MCPJsonRpcUser(BaseUser):
             "clientInfo": {"name": "locust-load-test", "version": "1.0.0"},
         }
         with self.client.post(
-            "/protocol/initialize",
+            "/v1/protocol/initialize",
             json=payload,
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/protocol/initialize",
+            name="/v1/protocol/initialize",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, *INFRASTRUCTURE_ERROR_CODES])
@@ -1385,10 +1385,10 @@ class MCPJsonRpcUser(BaseUser):
         """Protocol endpoint: Ping (JSON-RPC format)."""
         payload = _json_rpc_request("ping")
         with self.client.post(
-            "/protocol/ping",
+            "/v1/protocol/ping",
             json=payload,
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/protocol/ping",
+            name="/v1/protocol/ping",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, *INFRASTRUCTURE_ERROR_CODES])
@@ -1415,14 +1415,14 @@ class WriteAPIUser(BaseUser):
         # Clean up tools
         for tool_id in self.created_tools:
             try:
-                self.client.delete(f"/tools/{tool_id}", headers=self.auth_headers, name="/tools/[id] [cleanup]")
+                self.client.delete(f"/v1/tools/{tool_id}", headers=self.auth_headers, name="/v1/tools/[id] [cleanup]")
             except Exception:
                 pass
 
         # Clean up servers
         for server_id in self.created_servers:
             try:
-                self.client.delete(f"/servers/{server_id}", headers=self.auth_headers, name="/servers/[id] [cleanup]")
+                self.client.delete(f"/v1/servers/{server_id}", headers=self.auth_headers, name="/v1/servers/[id] [cleanup]")
             except Exception:
                 pass
 
@@ -1440,7 +1440,7 @@ class WriteAPIUser(BaseUser):
 
         # Create
         with self.client.post(
-            "/tools",
+            "/v1/tools",
             json=tool_data,
             headers={**self.auth_headers, "Content-Type": "application/json"},
             name="/tools [create]",
@@ -1454,7 +1454,7 @@ class WriteAPIUser(BaseUser):
                     tool_id = data.get("id") or data.get("name") or tool_name
                     # Delete immediately
                     time.sleep(0.1)
-                    self.client.delete(f"/tools/{tool_id}", headers=self.auth_headers, name="/tools/[id] [delete]")
+                    self.client.delete(f"/v1/tools/{tool_id}", headers=self.auth_headers, name="/v1/tools/[id] [delete]")
                 except Exception:
                     pass
             elif response.status_code in (409, 422):
@@ -1472,7 +1472,7 @@ class WriteAPIUser(BaseUser):
 
         # Create
         with self.client.post(
-            "/servers",
+            "/v1/servers",
             json=server_data,
             headers={**self.auth_headers, "Content-Type": "application/json"},
             name="/servers [create]",
@@ -1486,7 +1486,7 @@ class WriteAPIUser(BaseUser):
                     server_id = data.get("id") or data.get("name") or server_name
                     # Delete immediately
                     time.sleep(0.1)
-                    self.client.delete(f"/servers/{server_id}", headers=self.auth_headers, name="/servers/[id] [delete]")
+                    self.client.delete(f"/v1/servers/{server_id}", headers=self.auth_headers, name="/v1/servers/[id] [delete]")
                 except Exception:
                     pass
             elif response.status_code in (409, 422):
@@ -1499,9 +1499,9 @@ class WriteAPIUser(BaseUser):
         if SERVER_IDS:
             server_id = random.choice(SERVER_IDS)
             with self.client.post(
-                f"/servers/{server_id}/state",
+                f"/v1/servers/{server_id}/state",
                 headers=self.auth_headers,
-                name="/servers/[id]/state",
+                name="/v1/servers/[id]/state",
                 catch_response=True,
             ) as response:
                 # 403/404 acceptable - entity may not exist or may be read-only
@@ -1515,9 +1515,9 @@ class WriteAPIUser(BaseUser):
         if TOOL_IDS:
             tool_id = random.choice(TOOL_IDS)
             with self.client.post(
-                f"/tools/{tool_id}/state",
+                f"/v1/tools/{tool_id}/state",
                 headers=self.auth_headers,
-                name="/tools/[id]/state",
+                name="/v1/tools/[id]/state",
                 catch_response=True,
             ) as response:
                 # 403/404 acceptable - entity may not exist or may be read-only
@@ -1531,9 +1531,9 @@ class WriteAPIUser(BaseUser):
         if RESOURCE_IDS:
             resource_id = random.choice(RESOURCE_IDS)
             with self.client.post(
-                f"/resources/{resource_id}/state",
+                f"/v1/resources/{resource_id}/state",
                 headers=self.auth_headers,
-                name="/resources/[id]/state",
+                name="/v1/resources/[id]/state",
                 catch_response=True,
             ) as response:
                 # 403/404 acceptable - entity may not exist or may be read-only
@@ -1547,9 +1547,9 @@ class WriteAPIUser(BaseUser):
         if PROMPT_IDS:
             prompt_id = random.choice(PROMPT_IDS)
             with self.client.post(
-                f"/prompts/{prompt_id}/state",
+                f"/v1/prompts/{prompt_id}/state",
                 headers=self.auth_headers,
-                name="/prompts/[id]/state",
+                name="/v1/prompts/[id]/state",
                 catch_response=True,
             ) as response:
                 # 403/404 acceptable - entity may not exist or may be read-only
@@ -1563,9 +1563,9 @@ class WriteAPIUser(BaseUser):
         if GATEWAY_IDS:
             gateway_id = random.choice(GATEWAY_IDS)
             with self.client.post(
-                f"/gateways/{gateway_id}/state",
+                f"/v1/gateways/{gateway_id}/state",
                 headers=self.auth_headers,
-                name="/gateways/[id]/state",
+                name="/v1/gateways/[id]/state",
                 catch_response=True,
             ) as response:
                 # 403/404 acceptable - gateway may not exist or may be unreachable
@@ -1587,7 +1587,7 @@ class WriteAPIUser(BaseUser):
         }
 
         with self.client.post(
-            "/resources",
+            "/v1/resources",
             json=resource_data,
             headers={**self.auth_headers, "Content-Type": "application/json"},
             name="/resources [create]",
@@ -1598,7 +1598,7 @@ class WriteAPIUser(BaseUser):
                     data = response.json()
                     res_id = data.get("id") or data.get("uri") or resource_uri
                     time.sleep(0.1)
-                    self.client.delete(f"/resources/{res_id}", headers=self.auth_headers, name="/resources/[id] [delete]")
+                    self.client.delete(f"/v1/resources/{res_id}", headers=self.auth_headers, name="/v1/resources/[id] [delete]")
                 except Exception:
                     pass
             elif response.status_code in (409, 422, *INFRASTRUCTURE_ERROR_CODES):
@@ -1617,7 +1617,7 @@ class WriteAPIUser(BaseUser):
         }
 
         with self.client.post(
-            "/prompts",
+            "/v1/prompts",
             json=prompt_data,
             headers={**self.auth_headers, "Content-Type": "application/json"},
             name="/prompts [create]",
@@ -1630,7 +1630,7 @@ class WriteAPIUser(BaseUser):
                     data = response.json()
                     prompt_id = data.get("id") or data.get("name") or prompt_name
                     time.sleep(0.1)
-                    self.client.delete(f"/prompts/{prompt_id}", headers=self.auth_headers, name="/prompts/[id] [delete]")
+                    self.client.delete(f"/v1/prompts/{prompt_id}", headers=self.auth_headers, name="/v1/prompts/[id] [delete]")
                 except Exception:
                     pass
             elif response.status_code in (409, 422):
@@ -1643,7 +1643,7 @@ class WriteAPIUser(BaseUser):
         # First, get list of gateways
         # API returns {"gateways": [...], "nextCursor": ...} or list for legacy
         with self.client.get(
-            "/gateways",
+            "/v1/gateways",
             headers=self.auth_headers,
             name="/gateways [list for refresh]",
             catch_response=True,
@@ -1671,9 +1671,9 @@ class WriteAPIUser(BaseUser):
         gateway_id = gateway.get("id")
         if gateway_id:
             with self.client.get(
-                f"/gateways/{gateway_id}",
+                f"/v1/gateways/{gateway_id}",
                 headers=self.auth_headers,
-                name="/gateways/[id] [read]",
+                name="/v1/gateways/[id] [read]",
                 catch_response=True,
             ) as response:
                 self._validate_json_response(response, allowed_codes=[200, 404])
@@ -1705,7 +1705,7 @@ class StressTestUser(BaseUser):
     @tag("stress", "api")
     def rapid_tools_list(self):
         """Rapid tools listing."""
-        with self.client.get("/tools", headers=self.auth_headers, name="/tools [stress]", catch_response=True) as response:
+        with self.client.get("/v1/tools", headers=self.auth_headers, name="/tools [stress]", catch_response=True) as response:
             self._validate_status(response)
 
     @task(5)
@@ -2078,9 +2078,9 @@ class ExportImportUser(BaseUser):
     def export_full(self):
         """GET /export - Export full gateway configuration."""
         with self.client.get(
-            "/export",
+            "/v1/export",
             headers=self.auth_headers,
-            name="/export",
+            name="/v1/export",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -2098,9 +2098,9 @@ class ExportImportUser(BaseUser):
     def import_status_list(self):
         """GET /import/status - List all import job statuses."""
         with self.client.get(
-            "/import/status",
+            "/v1/import/status",
             headers=self.auth_headers,
-            name="/import/status",
+            name="/v1/import/status",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -2110,9 +2110,9 @@ class ExportImportUser(BaseUser):
     def import_cleanup(self):
         """POST /import/cleanup - Clean up old import jobs."""
         with self.client.post(
-            "/import/cleanup",
+            "/v1/import/cleanup",
             headers=self.auth_headers,
-            name="/import/cleanup",
+            name="/v1/import/cleanup",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -2148,9 +2148,9 @@ class A2AFullCRUDUser(BaseUser):
         for agent_id in self.created_agents:
             try:
                 self.client.delete(
-                    f"/a2a/{agent_id}",
+                    f"/v1/a2a/{agent_id}",
                     headers=self.auth_headers,
-                    name="/a2a/[id] [cleanup]",
+                    name="/v1/a2a/[id] [cleanup]",
                 )
             except Exception:
                 pass
@@ -2160,7 +2160,7 @@ class A2AFullCRUDUser(BaseUser):
     def get_single_agent(self):
         """GET /a2a/{agent_id} - Get details of a specific A2A agent."""
         with self.client.get(
-            "/a2a",
+            "/v1/a2a",
             headers=self.auth_headers,
             name="/a2a [list for get]",
             catch_response=True,
@@ -2174,9 +2174,9 @@ class A2AFullCRUDUser(BaseUser):
                     agent_id = random.choice(agents).get("id")
                     if agent_id:
                         with self.client.get(
-                            f"/a2a/{agent_id}",
+                            f"/v1/a2a/{agent_id}",
                             headers=self.auth_headers,
-                            name="/a2a/[id]",
+                            name="/v1/a2a/[id]",
                             catch_response=True,
                         ) as detail_response:
                             self._validate_json_response(detail_response, allowed_codes=[200, 404])
@@ -2197,7 +2197,7 @@ class A2AFullCRUDUser(BaseUser):
         }
 
         with self.client.post(
-            "/a2a",
+            "/v1/a2a",
             json=agent_data,
             headers={**self.auth_headers, "Content-Type": "application/json"},
             name="/a2a [create]",
@@ -2209,9 +2209,9 @@ class A2AFullCRUDUser(BaseUser):
                     agent_id = data.get("id") or data.get("name") or agent_name
                     time.sleep(0.1)
                     self.client.delete(
-                        f"/a2a/{agent_id}",
+                        f"/v1/a2a/{agent_id}",
                         headers=self.auth_headers,
-                        name="/a2a/[id] [delete]",
+                        name="/v1/a2a/[id] [delete]",
                     )
                     response.success()
                 except Exception:
@@ -2251,7 +2251,7 @@ class A2AEchoInvokeUser(BaseUser):
     def _discover_agent(self) -> None:
         """Discover required echo agent and fail in strict mode when unavailable."""
         self.agent_name = None
-        with self.client.get("/a2a", headers=self.auth_headers, name="/a2a [discover echo]", catch_response=True) as response:
+        with self.client.get("/v1/a2a", headers=self.auth_headers, name="/a2a [discover echo]", catch_response=True) as response:
             if not self._validate_json_response(response, allowed_codes=[200]):
                 return
             try:
@@ -2288,10 +2288,10 @@ class A2AEchoInvokeUser(BaseUser):
         }
 
         with self.client.post(
-            f"/a2a/{self.agent_name}/invoke",
+            f"/v1/a2a/{self.agent_name}/invoke",
             json=payload,
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/a2a/a2a-echo-agent/invoke",
+            name="/v1/a2a/a2a-echo-agent/invoke",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 400, 404, 422, 500, 503, *INFRASTRUCTURE_ERROR_CODES])
@@ -2329,9 +2329,9 @@ class ResourcesExtendedUser(BaseUser):
     def list_resource_templates(self):
         """GET /resources/templates/list - List resource templates via REST."""
         with self.client.get(
-            "/resources/templates/list",
+            "/v1/resources/templates/list",
             headers=self.auth_headers,
-            name="/resources/templates/list",
+            name="/v1/resources/templates/list",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -2343,9 +2343,9 @@ class ResourcesExtendedUser(BaseUser):
         if RESOURCE_IDS:
             resource_id = random.choice(RESOURCE_IDS)
             with self.client.get(
-                f"/resources/{resource_id}/info",
+                f"/v1/resources/{resource_id}/info",
                 headers=self.auth_headers,
-                name="/resources/[id]/info",
+                name="/v1/resources/[id]/info",
                 catch_response=True,
             ) as response:
                 # 200=Success, 404=Not found
@@ -2386,9 +2386,9 @@ class ServerExtendedUser(BaseUser):
         if SERVER_IDS:
             server_id = random.choice(SERVER_IDS)
             with self.client.get(
-                f"/servers/{server_id}/prompts",
+                f"/v1/servers/{server_id}/prompts",
                 headers=self.auth_headers,
-                name="/servers/[id]/prompts",
+                name="/v1/servers/[id]/prompts",
                 catch_response=True,
             ) as response:
                 # 200=Success, 404=Server not found
@@ -2427,9 +2427,9 @@ class TokensUser(BaseUser):
     def list_tokens(self):
         """GET /tokens - List user's API tokens."""
         with self.client.get(
-            "/tokens",
+            "/v1/tokens",
             headers=self.auth_headers,
-            name="/tokens",
+            name="/v1/tokens",
             catch_response=True,
         ) as response:
             # 200=Success, 401=Unauthorized, 403=Forbidden
@@ -2459,9 +2459,9 @@ class RBACUser(BaseUser):
     def list_roles(self):
         """GET /rbac/roles - List all RBAC roles."""
         with self.client.get(
-            "/rbac/roles",
+            "/v1/rbac/roles",
             headers=self.auth_headers,
-            name="/rbac/roles",
+            name="/v1/rbac/roles",
             catch_response=True,
         ) as response:
             # 200=Success, 401=Unauthorized, 403=Forbidden
@@ -2472,9 +2472,9 @@ class RBACUser(BaseUser):
     def get_my_roles(self):
         """GET /rbac/my/roles - Get current user's roles."""
         with self.client.get(
-            "/rbac/my/roles",
+            "/v1/rbac/my/roles",
             headers=self.auth_headers,
-            name="/rbac/my/roles",
+            name="/v1/rbac/my/roles",
             catch_response=True,
         ) as response:
             # 200=Success, 401=Unauthorized
@@ -2485,9 +2485,9 @@ class RBACUser(BaseUser):
     def get_my_permissions(self):
         """GET /rbac/my/permissions - Get current user's permissions."""
         with self.client.get(
-            "/rbac/my/permissions",
+            "/v1/rbac/my/permissions",
             headers=self.auth_headers,
-            name="/rbac/my/permissions",
+            name="/v1/rbac/my/permissions",
             catch_response=True,
         ) as response:
             # 200=Success, 401=Unauthorized
@@ -2498,9 +2498,9 @@ class RBACUser(BaseUser):
     def list_available_permissions(self):
         """GET /rbac/permissions/available - List all available permissions."""
         with self.client.get(
-            "/rbac/permissions/available",
+            "/v1/rbac/permissions/available",
             headers=self.auth_headers,
-            name="/rbac/permissions/available",
+            name="/v1/rbac/permissions/available",
             catch_response=True,
         ) as response:
             # 200=Success, 401=Unauthorized, 403=Forbidden
@@ -2541,9 +2541,9 @@ class AuthUser(BaseUser):
     def get_auth_events(self):
         """GET /auth/email/events - Get current user's authentication events."""
         with self.client.get(
-            "/auth/email/events",
+            "/v1/auth/email/events",
             headers=self.auth_headers,
-            name="/auth/email/events",
+            name="/v1/auth/email/events",
             catch_response=True,
         ) as response:
             # 200=Success, 401=Unauthorized
@@ -2554,9 +2554,9 @@ class AuthUser(BaseUser):
     def get_admin_auth_events(self):
         """GET /auth/email/admin/events - Admin view of all authentication events."""
         with self.client.get(
-            "/auth/email/admin/events",
+            "/v1/auth/email/admin/events",
             headers=self.auth_headers,
-            name="/auth/email/admin/events",
+            name="/v1/auth/email/admin/events",
             catch_response=True,
         ) as response:
             # 200=Success, 401=Unauthorized, 403=Forbidden
@@ -2567,9 +2567,9 @@ class AuthUser(BaseUser):
     def list_admin_users(self):
         """GET /auth/email/admin/users - Admin list of registered email users."""
         with self.client.get(
-            "/auth/email/admin/users",
+            "/v1/auth/email/admin/users",
             headers=self.auth_headers,
-            name="/auth/email/admin/users",
+            name="/v1/auth/email/admin/users",
             catch_response=True,
         ) as response:
             # 200=Success, 401=Unauthorized, 403=Forbidden
@@ -2705,9 +2705,9 @@ class MetricsUser(BaseUser):
     def get_metrics(self):
         """GET /metrics - Get aggregated system metrics."""
         with self.client.get(
-            "/metrics",
+            "/v1/metrics",
             headers=self.auth_headers,
-            name="/metrics",
+            name="/v1/metrics",
             catch_response=True,
         ) as response:
             # 200=Success, 401=Unauthorized
@@ -2744,9 +2744,9 @@ class MetricsUser(BaseUser):
     def get_prometheus_metrics(self):
         """GET /metrics/prometheus - Get Prometheus-format metrics."""
         with self.client.get(
-            "/metrics/prometheus",
+            "/v1/metrics/prometheus",
             headers=self.auth_headers,
-            name="/metrics/prometheus",
+            name="/v1/metrics/prometheus",
             catch_response=True,
         ) as response:
             # 200=Success - Prometheus format is plain text, not JSON
@@ -2783,9 +2783,9 @@ class ObservabilityUser(BaseUser):
     def get_tools_usage(self):
         """GET /admin/observability/tools/usage - Get tool usage statistics."""
         with self.client.get(
-            "/admin/observability/tools/usage",
+            "/v1/admin/observability/tools/usage",
             headers=self.auth_headers,
-            name="/admin/observability/tools/usage",
+            name="/v1/admin/observability/tools/usage",
             catch_response=True,
         ) as response:
             self._validate_json_response(response, allowed_codes=[200, 401, 403, 500])
@@ -2795,9 +2795,9 @@ class ObservabilityUser(BaseUser):
     def get_tools_performance(self):
         """GET /admin/observability/tools/performance - Get tool performance data."""
         with self.client.get(
-            "/admin/observability/tools/performance",
+            "/v1/admin/observability/tools/performance",
             headers=self.auth_headers,
-            name="/admin/observability/tools/performance",
+            name="/v1/admin/observability/tools/performance",
             catch_response=True,
         ) as response:
             self._validate_json_response(response, allowed_codes=[200, 401, 403, 500])
@@ -2807,9 +2807,9 @@ class ObservabilityUser(BaseUser):
     def get_top_volume(self):
         """GET /admin/observability/metrics/top-volume - Get top volume endpoints."""
         with self.client.get(
-            "/admin/observability/metrics/top-volume",
+            "/v1/admin/observability/metrics/top-volume",
             headers=self.auth_headers,
-            name="/admin/observability/metrics/top-volume",
+            name="/v1/admin/observability/metrics/top-volume",
             catch_response=True,
         ) as response:
             self._validate_json_response(response, allowed_codes=[200, 401, 403, 500])
@@ -2849,9 +2849,9 @@ class LLMUser(BaseUser):
     def get_gateway_models(self):
         """GET /llm/gateway/models - List gateway-available LLM models."""
         with self.client.get(
-            "/llm/gateway/models",
+            "/v1/llm/gateway/models",
             headers=self.auth_headers,
-            name="/llm/gateway/models",
+            name="/v1/llm/gateway/models",
             catch_response=True,
         ) as response:
             # 200=Success, 401=Unauthorized
@@ -2875,9 +2875,9 @@ class LLMUser(BaseUser):
     def get_provider_configs(self):
         """GET /admin/llm/provider-configs - Get LLM provider configurations."""
         with self.client.get(
-            "/admin/llm/provider-configs",
+            "/v1/admin/llm/provider-configs",
             headers=self.auth_headers,
-            name="/admin/llm/provider-configs",
+            name="/v1/admin/llm/provider-configs",
             catch_response=True,
         ) as response:
             # 200=Success, 401=Unauthorized, 403=Forbidden
@@ -2888,9 +2888,9 @@ class LLMUser(BaseUser):
     def get_provider_defaults(self):
         """GET /admin/llm/provider-defaults - Get default LLM provider settings."""
         with self.client.get(
-            "/admin/llm/provider-defaults",
+            "/v1/admin/llm/provider-defaults",
             headers=self.auth_headers,
-            name="/admin/llm/provider-defaults",
+            name="/v1/admin/llm/provider-defaults",
             catch_response=True,
         ) as response:
             # 200=Success, 401=Unauthorized, 403=Forbidden
@@ -2962,7 +2962,7 @@ def on_test_start_batch1(environment, **_kwargs):
             TEAM_IDS.extend([str(t.get("id")) for t in items[:20] if t.get("id")])
             logger.info(f"Loaded {len(TEAM_IDS)} team IDs")
         else:
-            endpoint_failures.append(f"/teams/ -> HTTP {status}")
+            endpoint_failures.append(f"/v1/teams/ -> HTTP {status}")
 
         # Fetch RBAC roles
         status, data = _fetch_json(f"{host}/rbac/roles", headers)
@@ -2972,7 +2972,7 @@ def on_test_start_batch1(environment, **_kwargs):
             ROLE_IDS.extend([str(r.get("id")) for r in non_system_roles[:20]])
             logger.info(f"Loaded {len(ROLE_IDS)} role IDs")
         else:
-            endpoint_failures.append(f"/rbac/roles -> HTTP {status}")
+            endpoint_failures.append(f"/v1/rbac/roles -> HTTP {status}")
 
         missing_pools: list[str] = []
         if not TEAM_IDS:
@@ -3041,9 +3041,9 @@ class TeamsCRUDUser(BaseUser):
         for team_id in self.created_teams:
             try:
                 self.client.delete(
-                    f"/teams/{team_id}",
+                    f"/v1/teams/{team_id}",
                     headers=self.auth_headers,
-                    name="/teams/[id] [cleanup]",
+                    name="/v1/teams/[id] [cleanup]",
                 )
             except Exception:
                 pass
@@ -3053,9 +3053,9 @@ class TeamsCRUDUser(BaseUser):
     def list_teams(self):
         """GET /teams/ - List all teams."""
         with self.client.get(
-            "/teams/",
+            "/v1/teams/",
             headers=self.auth_headers,
-            name="/teams/",
+            name="/v1/teams/",
             catch_response=True,
         ) as response:
             # 200=Success, 403=Forbidden, 500=Server error (teams may not be configured)
@@ -3066,9 +3066,9 @@ class TeamsCRUDUser(BaseUser):
     def discover_teams(self):
         """GET /teams/discover - Discover public teams."""
         with self.client.get(
-            "/teams/discover",
+            "/v1/teams/discover",
             headers=self.auth_headers,
-            name="/teams/discover",
+            name="/v1/teams/discover",
             catch_response=True,
         ) as response:
             # 200=Success, 401=Auth issue, 403=Forbidden, 500=Server error
@@ -3081,9 +3081,9 @@ class TeamsCRUDUser(BaseUser):
         if TEAM_IDS:
             team_id = random.choice(TEAM_IDS)
             with self.client.get(
-                f"/teams/{team_id}",
+                f"/v1/teams/{team_id}",
                 headers=self.auth_headers,
-                name="/teams/[id]",
+                name="/v1/teams/[id]",
                 catch_response=True,
             ) as response:
                 # 200=Success, 403=Forbidden, 404=Not found, 500=Server error
@@ -3096,9 +3096,9 @@ class TeamsCRUDUser(BaseUser):
         if TEAM_IDS:
             team_id = random.choice(TEAM_IDS)
             with self.client.get(
-                f"/teams/{team_id}/members",
+                f"/v1/teams/{team_id}/members",
                 headers=self.auth_headers,
-                name="/teams/[id]/members",
+                name="/v1/teams/[id]/members",
                 catch_response=True,
             ) as response:
                 # 200=Success, 403=Forbidden, 404=Not found, 500=Server error
@@ -3111,9 +3111,9 @@ class TeamsCRUDUser(BaseUser):
         if TEAM_IDS:
             team_id = random.choice(TEAM_IDS)
             with self.client.get(
-                f"/teams/{team_id}/invitations",
+                f"/v1/teams/{team_id}/invitations",
                 headers=self.auth_headers,
-                name="/teams/[id]/invitations",
+                name="/v1/teams/[id]/invitations",
                 catch_response=True,
             ) as response:
                 # 200=Success, 403=Forbidden, 404=Not found, 500=Server error
@@ -3126,9 +3126,9 @@ class TeamsCRUDUser(BaseUser):
         if TEAM_IDS:
             team_id = random.choice(TEAM_IDS)
             with self.client.get(
-                f"/teams/{team_id}/join-requests",
+                f"/v1/teams/{team_id}/join-requests",
                 headers=self.auth_headers,
-                name="/teams/[id]/join-requests",
+                name="/v1/teams/[id]/join-requests",
                 catch_response=True,
             ) as response:
                 # 200=Success, 403=Forbidden, 404=Not found, 500=Server error
@@ -3146,10 +3146,10 @@ class TeamsCRUDUser(BaseUser):
         }
 
         with self.client.post(
-            "/teams/",
+            "/v1/teams/",
             json=team_data,
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/teams/ [create]",
+            name="/v1/teams/ [create]",
             catch_response=True,
         ) as response:
             if response.status_code in (200, 201):
@@ -3158,9 +3158,9 @@ class TeamsCRUDUser(BaseUser):
                     team_id = data.get("id") or data.get("name") or team_name
                     time.sleep(0.1)
                     self.client.delete(
-                        f"/teams/{team_id}",
+                        f"/v1/teams/{team_id}",
                         headers=self.auth_headers,
-                        name="/teams/[id] [delete]",
+                        name="/v1/teams/[id] [delete]",
                     )
                     response.success()
                 except Exception:
@@ -3201,9 +3201,9 @@ class TokenCatalogCRUDUser(BaseUser):
         for token_id in self.created_tokens:
             try:
                 self.client.delete(
-                    f"/tokens/{token_id}",
+                    f"/v1/tokens/{token_id}",
                     headers=self.auth_headers,
-                    name="/tokens/[id] [cleanup]",
+                    name="/v1/tokens/[id] [cleanup]",
                 )
             except Exception:
                 pass
@@ -3213,9 +3213,9 @@ class TokenCatalogCRUDUser(BaseUser):
     def list_tokens(self):
         """GET /tokens - List user's tokens."""
         with self.client.get(
-            "/tokens",
+            "/v1/tokens",
             headers=self.auth_headers,
-            name="/tokens",
+            name="/v1/tokens",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -3225,9 +3225,9 @@ class TokenCatalogCRUDUser(BaseUser):
     def list_all_tokens_admin(self):
         """GET /tokens/admin/all - Admin: list all tokens."""
         with self.client.get(
-            "/tokens/admin/all",
+            "/v1/tokens/admin/all",
             headers=self.auth_headers,
-            name="/tokens/admin/all",
+            name="/v1/tokens/admin/all",
             catch_response=True,
         ) as response:
             # 200=Success, 403=Forbidden (non-admin)
@@ -3245,7 +3245,7 @@ class TokenCatalogCRUDUser(BaseUser):
         }
 
         with self.client.post(
-            "/tokens",
+            "/v1/tokens",
             json=token_data,
             headers={**self.auth_headers, "Content-Type": "application/json"},
             name="/tokens [create]",
@@ -3261,23 +3261,23 @@ class TokenCatalogCRUDUser(BaseUser):
                         # Get token details
                         time.sleep(0.05)
                         self.client.get(
-                            f"/tokens/{token_id}",
+                            f"/v1/tokens/{token_id}",
                             headers=self.auth_headers,
-                            name="/tokens/[id]",
+                            name="/v1/tokens/[id]",
                         )
                         # Get usage stats
                         time.sleep(0.05)
                         self.client.get(
-                            f"/tokens/{token_id}/usage",
+                            f"/v1/tokens/{token_id}/usage",
                             headers=self.auth_headers,
-                            name="/tokens/[id]/usage",
+                            name="/v1/tokens/[id]/usage",
                         )
                         # Delete token
                         time.sleep(0.05)
                         self.client.delete(
-                            f"/tokens/{token_id}",
+                            f"/v1/tokens/{token_id}",
                             headers=self.auth_headers,
-                            name="/tokens/[id] [delete]",
+                            name="/v1/tokens/[id] [delete]",
                         )
                     response.success()
                 except Exception:
@@ -3292,9 +3292,9 @@ class TokenCatalogCRUDUser(BaseUser):
         if TEAM_IDS:
             team_id = random.choice(TEAM_IDS)
             with self.client.get(
-                f"/tokens/teams/{team_id}",
+                f"/v1/tokens/teams/{team_id}",
                 headers=self.auth_headers,
-                name="/tokens/teams/[id]",
+                name="/v1/tokens/teams/[id]",
                 catch_response=True,
             ) as response:
                 self._validate_json_response(response, allowed_codes=[200, 403, 404])
@@ -3333,9 +3333,9 @@ class RBACCRUDUser(BaseUser):
         for role_id in self.created_roles:
             try:
                 self.client.delete(
-                    f"/rbac/roles/{role_id}",
+                    f"/v1/rbac/roles/{role_id}",
                     headers=self.auth_headers,
-                    name="/rbac/roles/[id] [cleanup]",
+                    name="/v1/rbac/roles/[id] [cleanup]",
                 )
             except Exception:
                 pass
@@ -3345,9 +3345,9 @@ class RBACCRUDUser(BaseUser):
     def list_roles(self):
         """GET /rbac/roles - List all roles."""
         with self.client.get(
-            "/rbac/roles",
+            "/v1/rbac/roles",
             headers=self.auth_headers,
-            name="/rbac/roles",
+            name="/v1/rbac/roles",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -3359,9 +3359,9 @@ class RBACCRUDUser(BaseUser):
         if ROLE_IDS:
             role_id = random.choice(ROLE_IDS)
             with self.client.get(
-                f"/rbac/roles/{role_id}",
+                f"/v1/rbac/roles/{role_id}",
                 headers=self.auth_headers,
-                name="/rbac/roles/[id]",
+                name="/v1/rbac/roles/[id]",
                 catch_response=True,
             ) as response:
                 self._validate_json_response(response, allowed_codes=[200, 404])
@@ -3375,10 +3375,10 @@ class RBACCRUDUser(BaseUser):
             "permission": "tools:read",
         }
         with self.client.post(
-            "/rbac/permissions/check",
+            "/v1/rbac/permissions/check",
             json=check_data,
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/rbac/permissions/check",
+            name="/v1/rbac/permissions/check",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -3388,9 +3388,9 @@ class RBACCRUDUser(BaseUser):
     def get_user_permissions(self):
         """GET /rbac/permissions/user/{user_email} - Get user's permissions."""
         with self.client.get(
-            "/rbac/permissions/user/admin@example.com",
+            "/v1/rbac/permissions/user/admin@example.com",
             headers=self.auth_headers,
-            name="/rbac/permissions/user/[email]",
+            name="/v1/rbac/permissions/user/[email]",
             catch_response=True,
         ) as response:
             self._validate_json_response(response, allowed_codes=[200, 404])
@@ -3400,9 +3400,9 @@ class RBACCRUDUser(BaseUser):
     def get_user_roles(self):
         """GET /rbac/users/{user_email}/roles - Get user's assigned roles."""
         with self.client.get(
-            "/rbac/users/admin@example.com/roles",
+            "/v1/rbac/users/admin@example.com/roles",
             headers=self.auth_headers,
-            name="/rbac/users/[email]/roles",
+            name="/v1/rbac/users/[email]/roles",
             catch_response=True,
         ) as response:
             self._validate_json_response(response, allowed_codes=[200, 404])
@@ -3419,10 +3419,10 @@ class RBACCRUDUser(BaseUser):
         }
 
         with self.client.post(
-            "/rbac/roles",
+            "/v1/rbac/roles",
             json=role_data,
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/rbac/roles [create]",
+            name="/v1/rbac/roles [create]",
             catch_response=True,
         ) as response:
             if response.status_code in INFRASTRUCTURE_ERROR_CODES:
@@ -3433,9 +3433,9 @@ class RBACCRUDUser(BaseUser):
                     role_id = data.get("id") or data.get("name") or role_name
                     time.sleep(0.1)
                     self.client.delete(
-                        f"/rbac/roles/{role_id}",
+                        f"/v1/rbac/roles/{role_id}",
                         headers=self.auth_headers,
-                        name="/rbac/roles/[id] [delete]",
+                        name="/v1/rbac/roles/[id] [delete]",
                     )
                     response.success()
                 except Exception:
@@ -3466,9 +3466,9 @@ class CancellationAPIUser(BaseUser):
         # Use a random UUID as request_id (will likely return 404)
         request_id = str(uuid.uuid4())
         with self.client.get(
-            f"/cancellation/status/{request_id}",
+            f"/v1/cancellation/status/{request_id}",
             headers=self.auth_headers,
-            name="/cancellation/status/[id]",
+            name="/v1/cancellation/status/[id]",
             catch_response=True,
         ) as response:
             # 200=Found, 404=Not found (expected for random ID)
@@ -3484,10 +3484,10 @@ class CancellationAPIUser(BaseUser):
             "reason": "Load test cancellation",
         }
         with self.client.post(
-            "/cancellation/cancel",
+            "/v1/cancellation/cancel",
             json=cancel_data,
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/cancellation/cancel",
+            name="/v1/cancellation/cancel",
             catch_response=True,
         ) as response:
             # 200=Success, 404=Not found, 422=Invalid request
@@ -3554,9 +3554,9 @@ class RootsExtendedUser(BaseUser):
     def list_roots(self):
         """GET /roots - List all roots."""
         with self.client.get(
-            "/roots",
+            "/v1/roots",
             headers=self.auth_headers,
-            name="/roots",
+            name="/v1/roots",
             catch_response=True,
         ) as response:
             self._validate_json_response(response, allowed_codes=[200])
@@ -3573,7 +3573,7 @@ class RootsExtendedUser(BaseUser):
         }
 
         with self.client.post(
-            "/roots",
+            "/v1/roots",
             json=root_data,
             headers={**self.auth_headers, "Content-Type": "application/json"},
             name="/roots [create]",
@@ -3588,9 +3588,9 @@ class RootsExtendedUser(BaseUser):
                     encoded_query_uri = quote(root_uri, safe="")
 
                     with self.client.get(
-                        f"/roots/export?uri={encoded_query_uri}",
+                        f"/v1/roots/export?uri={encoded_query_uri}",
                         headers=self.auth_headers,
-                        name="/roots/export",
+                        name="/v1/roots/export",
                         catch_response=True,
                     ) as export_response:
                         self._validate_json_response(export_response, allowed_codes=[200, 404, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -3600,19 +3600,19 @@ class RootsExtendedUser(BaseUser):
                         "name": f"{root_name}-updated",
                     }
                     with self.client.put(
-                        f"/roots/{encoded_uri}",
+                        f"/v1/roots/{encoded_uri}",
                         json=update_data,
                         headers={**self.auth_headers, "Content-Type": "application/json"},
-                        name="/roots/[root_uri] [update]",
+                        name="/v1/roots/[root_uri] [update]",
                         catch_response=True,
                     ) as update_response:
                         self._validate_json_response(update_response, allowed_codes=[200, 404, 409, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
 
                     # Delete may return 404 (already deleted) or 500 (server bug)
                     with self.client.delete(
-                        f"/roots/{encoded_uri}",
+                        f"/v1/roots/{encoded_uri}",
                         headers=self.auth_headers,
-                        name="/roots/[uri] [delete]",
+                        name="/v1/roots/[uri] [delete]",
                         catch_response=True,
                     ) as del_response:
                         if del_response.status_code in (200, 204, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES):
@@ -3648,9 +3648,9 @@ class TagsExtendedUser(BaseUser):
         tag_names = ["mcp", "tool", "server", "gateway", "test", "loadtest"]
         tag_name = random.choice(tag_names)
         with self.client.get(
-            f"/tags/{tag_name}/entities",
+            f"/v1/tags/{tag_name}/entities",
             headers=self.auth_headers,
-            name="/tags/[name]/entities",
+            name="/v1/tags/[name]/entities",
             catch_response=True,
         ) as response:
             # 200=Success, 404=Tag not found, 500=DB contention under load
@@ -3766,9 +3766,9 @@ class AuthExtendedUser(BaseUser):
     def get_current_user(self):
         """GET /auth/email/me - Get current authenticated user info."""
         with self.client.get(
-            "/auth/email/me",
+            "/v1/auth/email/me",
             headers=self.auth_headers,
-            name="/auth/email/me",
+            name="/v1/auth/email/me",
             catch_response=True,
         ) as response:
             # 200=Success, 401=Unauthorized, 404=Not found, 422=Validation error
@@ -3783,10 +3783,10 @@ class AuthExtendedUser(BaseUser):
             "password": "admin",  # Default test password
         }
         with self.client.post(
-            "/auth/login",
+            "/v1/auth/login",
             data=login_data,  # Form data, not JSON
             headers={**self.auth_headers, "Content-Type": "application/x-www-form-urlencoded"},
-            name="/auth/login",
+            name="/v1/auth/login",
             catch_response=True,
         ) as response:
             # 200=Success, 401=Invalid credentials, 422=Validation error
@@ -3819,9 +3819,9 @@ class EntityToggleUser(BaseUser):
         if TOOL_IDS:
             tool_id = random.choice(TOOL_IDS)
             with self.client.post(
-                f"/tools/{tool_id}/toggle",
+                f"/v1/tools/{tool_id}/toggle",
                 headers=self.auth_headers,
-                name="/tools/[id]/toggle",
+                name="/v1/tools/[id]/toggle",
                 catch_response=True,
             ) as response:
                 # 200=Success, 401=Auth issue, 403=Forbidden, 404=Not found, 409=Conflict
@@ -3834,9 +3834,9 @@ class EntityToggleUser(BaseUser):
         if SERVER_IDS:
             server_id = random.choice(SERVER_IDS)
             with self.client.post(
-                f"/servers/{server_id}/toggle",
+                f"/v1/servers/{server_id}/toggle",
                 headers=self.auth_headers,
-                name="/servers/[id]/toggle",
+                name="/v1/servers/[id]/toggle",
                 catch_response=True,
             ) as response:
                 self._validate_json_response(response, allowed_codes=[200, 401, 403, 404, 409, *INFRASTRUCTURE_ERROR_CODES])
@@ -3848,9 +3848,9 @@ class EntityToggleUser(BaseUser):
         if RESOURCE_IDS:
             resource_id = random.choice(RESOURCE_IDS)
             with self.client.post(
-                f"/resources/{resource_id}/toggle",
+                f"/v1/resources/{resource_id}/toggle",
                 headers=self.auth_headers,
-                name="/resources/[id]/toggle",
+                name="/v1/resources/[id]/toggle",
                 catch_response=True,
             ) as response:
                 self._validate_json_response(response, allowed_codes=[200, 401, 403, 404, 409, *INFRASTRUCTURE_ERROR_CODES])
@@ -3862,9 +3862,9 @@ class EntityToggleUser(BaseUser):
         if PROMPT_IDS:
             prompt_id = random.choice(PROMPT_IDS)
             with self.client.post(
-                f"/prompts/{prompt_id}/toggle",
+                f"/v1/prompts/{prompt_id}/toggle",
                 headers=self.auth_headers,
-                name="/prompts/[id]/toggle",
+                name="/v1/prompts/[id]/toggle",
                 catch_response=True,
             ) as response:
                 self._validate_json_response(response, allowed_codes=[200, 401, 403, 404, 409, *INFRASTRUCTURE_ERROR_CODES])
@@ -3897,9 +3897,9 @@ class EntityUpdateUser(BaseUser):
             tool_id = random.choice(TOOL_IDS)
             # First get current tool data
             with self.client.get(
-                f"/tools/{tool_id}",
+                f"/v1/tools/{tool_id}",
                 headers=self.auth_headers,
-                name="/tools/[id] [for update]",
+                name="/v1/tools/[id] [for update]",
                 catch_response=True,
             ) as response:
                 if response.status_code == 200:
@@ -3909,10 +3909,10 @@ class EntityUpdateUser(BaseUser):
                         tool_data["description"] = f"Updated by load test at {time.time()}"
                         time.sleep(0.05)
                         with self.client.put(
-                            f"/tools/{tool_id}",
+                            f"/v1/tools/{tool_id}",
                             json=tool_data,
                             headers={**self.auth_headers, "Content-Type": "application/json"},
-                            name="/tools/[id] [update]",
+                            name="/v1/tools/[id] [update]",
                             catch_response=True,
                         ) as put_response:
                             self._validate_json_response(put_response, allowed_codes=[0, 200, 403, 404, 409, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -3929,9 +3929,9 @@ class EntityUpdateUser(BaseUser):
         if RESOURCE_IDS:
             resource_id = random.choice(RESOURCE_IDS)
             with self.client.get(
-                f"/resources/{resource_id}",
+                f"/v1/resources/{resource_id}",
                 headers=self.auth_headers,
-                name="/resources/[id] [for update]",
+                name="/v1/resources/[id] [for update]",
                 catch_response=True,
             ) as response:
                 if response.status_code == 200:
@@ -3940,10 +3940,10 @@ class EntityUpdateUser(BaseUser):
                         resource_data["description"] = f"Updated by load test at {time.time()}"
                         time.sleep(0.05)
                         with self.client.put(
-                            f"/resources/{resource_id}",
+                            f"/v1/resources/{resource_id}",
                             json=resource_data,
                             headers={**self.auth_headers, "Content-Type": "application/json"},
-                            name="/resources/[id] [update]",
+                            name="/v1/resources/[id] [update]",
                             catch_response=True,
                         ) as put_response:
                             self._validate_json_response(put_response, allowed_codes=[0, 200, 403, 404, 409, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -3980,28 +3980,28 @@ class RealisticUser(BaseUser):
     @tag("realistic", "api")
     def list_tools(self):
         """List tools."""
-        with self.client.get("/tools", headers=self.auth_headers, name="/tools", catch_response=True) as response:
+        with self.client.get("/v1/tools", headers=self.auth_headers, name="/v1/tools", catch_response=True) as response:
             self._validate_status(response)
 
     @task(15)
     @tag("realistic", "api")
     def list_servers(self):
         """List servers."""
-        with self.client.get("/servers", headers=self.auth_headers, name="/servers", catch_response=True) as response:
+        with self.client.get("/v1/servers", headers=self.auth_headers, name="/v1/servers", catch_response=True) as response:
             self._validate_status(response)
 
     @task(10)
     @tag("realistic", "api")
     def list_gateways(self):
         """List gateways."""
-        with self.client.get("/gateways", headers=self.auth_headers, name="/gateways", catch_response=True) as response:
+        with self.client.get("/v1/gateways", headers=self.auth_headers, name="/v1/gateways", catch_response=True) as response:
             self._validate_status(response)
 
     @task(10)
     @tag("realistic", "api")
     def list_resources(self):
         """List resources."""
-        with self.client.get("/resources", headers=self.auth_headers, name="/resources", catch_response=True) as response:
+        with self.client.get("/v1/resources", headers=self.auth_headers, name="/v1/resources", catch_response=True) as response:
             self._validate_status(response)
 
     @task(10)
@@ -4026,9 +4026,9 @@ class RealisticUser(BaseUser):
     def admin_dashboard(self):
         """Load admin dashboard."""
         with self.client.get(
-            "/admin/",
+            "/v1/admin/",
             headers=self.admin_headers,
-            name="/admin/",
+            name="/v1/admin/",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, *INFRASTRUCTURE_ERROR_CODES])
@@ -4040,9 +4040,9 @@ class RealisticUser(BaseUser):
         if TOOL_IDS:
             tool_id = random.choice(TOOL_IDS)
             with self.client.get(
-                f"/tools/{tool_id}",
+                f"/v1/tools/{tool_id}",
                 headers=self.auth_headers,
-                name="/tools/[id]",
+                name="/v1/tools/[id]",
                 catch_response=True,
             ) as response:
                 self._validate_json_response(response, allowed_codes=[200, 404, *INFRASTRUCTURE_ERROR_CODES])
@@ -4054,9 +4054,9 @@ class RealisticUser(BaseUser):
         if SERVER_IDS:
             server_id = random.choice(SERVER_IDS)
             with self.client.get(
-                f"/servers/{server_id}",
+                f"/v1/servers/{server_id}",
                 headers=self.auth_headers,
-                name="/servers/[id]",
+                name="/v1/servers/[id]",
                 catch_response=True,
             ) as response:
                 self._validate_json_response(response, allowed_codes=[200, 404, *INFRASTRUCTURE_ERROR_CODES])
@@ -4065,7 +4065,7 @@ class RealisticUser(BaseUser):
     @tag("realistic", "admin")
     def admin_tools_page(self):
         """Admin tools page."""
-        with self.client.get("/admin/tools", headers=self.admin_headers, name="/admin/tools", catch_response=True) as response:
+        with self.client.get("/v1/admin/tools", headers=self.admin_headers, name="/v1/admin/tools", catch_response=True) as response:
             self._validate_status(response)
 
 
@@ -4117,10 +4117,10 @@ class ProtocolExtendedUser(BaseUser):
             "method": "notifications/initialized",
         }
         with self.client.post(
-            "/protocol/notifications",
+            "/v1/protocol/notifications",
             json=payload,
             headers=self.auth_headers,
-            name="/protocol/notifications",
+            name="/v1/protocol/notifications",
             catch_response=True,
         ) as response:
             # Initialized notification should consistently return 200.
@@ -4139,10 +4139,10 @@ class ProtocolExtendedUser(BaseUser):
             "argument": {"name": argument_name, "value": "val"},
         }
         with self.client.post(
-            "/protocol/completion/complete",
+            "/v1/protocol/completion/complete",
             json=payload,
             headers=self.auth_headers,
-            name="/protocol/completion/complete",
+            name="/v1/protocol/completion/complete",
             catch_response=True,
         ) as response:
             # 200=Success, 500=No completion handler configured
@@ -4162,10 +4162,10 @@ class ProtocolExtendedUser(BaseUser):
             "maxTokens": 10,
         }
         with self.client.post(
-            "/protocol/sampling/createMessage",
+            "/v1/protocol/sampling/createMessage",
             json=payload,
             headers=self.auth_headers,
-            name="/protocol/sampling/createMessage",
+            name="/v1/protocol/sampling/createMessage",
             catch_response=True,
         ) as response:
             # 200=Success, 500=No sampling handler configured
@@ -4223,9 +4223,9 @@ class LLMExtendedUser(BaseUser):
     def list_models(self):
         """GET /llm/models - List all LLM models."""
         with self.client.get(
-            "/llm/models",
+            "/v1/llm/models",
             headers=self.auth_headers,
-            name="/llm/models",
+            name="/v1/llm/models",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -4235,9 +4235,9 @@ class LLMExtendedUser(BaseUser):
     def list_providers(self):
         """GET /llm/providers - List all LLM providers."""
         with self.client.get(
-            "/llm/providers",
+            "/v1/llm/providers",
             headers=self.auth_headers,
-            name="/llm/providers",
+            name="/v1/llm/providers",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -4312,9 +4312,9 @@ class AdminObservabilityExtendedUser(BaseUser):
         """GET /admin/observability/partial - Observability overview."""
         headers = {**self.admin_headers, "HX-Request": "true"}
         with self.client.get(
-            "/admin/observability/partial",
+            "/v1/admin/observability/partial",
             headers=headers,
-            name="/admin/observability/partial",
+            name="/v1/admin/observability/partial",
             catch_response=True,
         ) as response:
             self._validate_html_response(response)
@@ -4324,9 +4324,9 @@ class AdminObservabilityExtendedUser(BaseUser):
     def observability_stats(self):
         """GET /admin/observability/stats - Observability statistics."""
         with self.client.get(
-            "/admin/observability/stats",
+            "/v1/admin/observability/stats",
             headers=self.admin_headers,
-            name="/admin/observability/stats",
+            name="/v1/admin/observability/stats",
             catch_response=True,
         ) as response:
             self._validate_status(response)
@@ -4336,9 +4336,9 @@ class AdminObservabilityExtendedUser(BaseUser):
     def observability_traces(self):
         """GET /admin/observability/traces - List traces."""
         with self.client.get(
-            "/admin/observability/traces",
+            "/v1/admin/observability/traces",
             headers=self.admin_headers,
-            name="/admin/observability/traces",
+            name="/v1/admin/observability/traces",
             catch_response=True,
         ) as response:
             self._validate_status(response)
@@ -4348,9 +4348,9 @@ class AdminObservabilityExtendedUser(BaseUser):
     def observability_heatmap(self):
         """GET /admin/observability/metrics/heatmap - Latency heatmap data."""
         with self.client.get(
-            "/admin/observability/metrics/heatmap",
+            "/v1/admin/observability/metrics/heatmap",
             headers=self.auth_headers,
-            name="/admin/observability/metrics/heatmap",
+            name="/v1/admin/observability/metrics/heatmap",
             catch_response=True,
         ) as response:
             self._validate_json_response(response, allowed_codes=[200, 500])
@@ -4360,9 +4360,9 @@ class AdminObservabilityExtendedUser(BaseUser):
     def observability_percentiles(self):
         """GET /admin/observability/metrics/percentiles - Latency percentiles."""
         with self.client.get(
-            "/admin/observability/metrics/percentiles",
+            "/v1/admin/observability/metrics/percentiles",
             headers=self.auth_headers,
-            name="/admin/observability/metrics/percentiles",
+            name="/v1/admin/observability/metrics/percentiles",
             catch_response=True,
         ) as response:
             self._validate_json_response(response, allowed_codes=[200, 500])
@@ -4372,9 +4372,9 @@ class AdminObservabilityExtendedUser(BaseUser):
     def observability_timeseries(self):
         """GET /admin/observability/metrics/timeseries - Request timeseries."""
         with self.client.get(
-            "/admin/observability/metrics/timeseries",
+            "/v1/admin/observability/metrics/timeseries",
             headers=self.auth_headers,
-            name="/admin/observability/metrics/timeseries",
+            name="/v1/admin/observability/metrics/timeseries",
             catch_response=True,
         ) as response:
             self._validate_json_response(response, allowed_codes=[200, 500])
@@ -4385,9 +4385,9 @@ class AdminObservabilityExtendedUser(BaseUser):
         """GET /admin/observability/metrics/partial - Metrics overview HTML."""
         headers = {**self.admin_headers, "HX-Request": "true"}
         with self.client.get(
-            "/admin/observability/metrics/partial",
+            "/v1/admin/observability/metrics/partial",
             headers=headers,
-            name="/admin/observability/metrics/partial",
+            name="/v1/admin/observability/metrics/partial",
             catch_response=True,
         ) as response:
             self._validate_html_response(response)
@@ -4397,9 +4397,9 @@ class AdminObservabilityExtendedUser(BaseUser):
     def observability_top_errors(self):
         """GET /admin/observability/metrics/top-errors - Top error endpoints."""
         with self.client.get(
-            "/admin/observability/metrics/top-errors",
+            "/v1/admin/observability/metrics/top-errors",
             headers=self.auth_headers,
-            name="/admin/observability/metrics/top-errors",
+            name="/v1/admin/observability/metrics/top-errors",
             catch_response=True,
         ) as response:
             self._validate_json_response(response, allowed_codes=[200, 500])
@@ -4409,9 +4409,9 @@ class AdminObservabilityExtendedUser(BaseUser):
     def observability_top_slow(self):
         """GET /admin/observability/metrics/top-slow - Top slow endpoints."""
         with self.client.get(
-            "/admin/observability/metrics/top-slow",
+            "/v1/admin/observability/metrics/top-slow",
             headers=self.auth_headers,
-            name="/admin/observability/metrics/top-slow",
+            name="/v1/admin/observability/metrics/top-slow",
             catch_response=True,
         ) as response:
             self._validate_json_response(response, allowed_codes=[200, 500])
@@ -4421,9 +4421,9 @@ class AdminObservabilityExtendedUser(BaseUser):
     def observability_prompts_errors(self):
         """GET /admin/observability/prompts/errors - Prompt errors."""
         with self.client.get(
-            "/admin/observability/prompts/errors",
+            "/v1/admin/observability/prompts/errors",
             headers=self.auth_headers,
-            name="/admin/observability/prompts/errors",
+            name="/v1/admin/observability/prompts/errors",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 500])
@@ -4434,9 +4434,9 @@ class AdminObservabilityExtendedUser(BaseUser):
         """GET /admin/observability/prompts/partial - Prompts observability HTML."""
         headers = {**self.admin_headers, "HX-Request": "true"}
         with self.client.get(
-            "/admin/observability/prompts/partial",
+            "/v1/admin/observability/prompts/partial",
             headers=headers,
-            name="/admin/observability/prompts/partial",
+            name="/v1/admin/observability/prompts/partial",
             catch_response=True,
         ) as response:
             self._validate_html_response(response)
@@ -4446,9 +4446,9 @@ class AdminObservabilityExtendedUser(BaseUser):
     def observability_prompts_performance(self):
         """GET /admin/observability/prompts/performance - Prompt performance."""
         with self.client.get(
-            "/admin/observability/prompts/performance",
+            "/v1/admin/observability/prompts/performance",
             headers=self.auth_headers,
-            name="/admin/observability/prompts/performance",
+            name="/v1/admin/observability/prompts/performance",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 500])
@@ -4458,9 +4458,9 @@ class AdminObservabilityExtendedUser(BaseUser):
     def observability_prompts_usage(self):
         """GET /admin/observability/prompts/usage - Prompt usage statistics."""
         with self.client.get(
-            "/admin/observability/prompts/usage",
+            "/v1/admin/observability/prompts/usage",
             headers=self.auth_headers,
-            name="/admin/observability/prompts/usage",
+            name="/v1/admin/observability/prompts/usage",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 500])
@@ -4470,9 +4470,9 @@ class AdminObservabilityExtendedUser(BaseUser):
     def observability_resources_errors(self):
         """GET /admin/observability/resources/errors - Resource errors."""
         with self.client.get(
-            "/admin/observability/resources/errors",
+            "/v1/admin/observability/resources/errors",
             headers=self.auth_headers,
-            name="/admin/observability/resources/errors",
+            name="/v1/admin/observability/resources/errors",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 500])
@@ -4483,9 +4483,9 @@ class AdminObservabilityExtendedUser(BaseUser):
         """GET /admin/observability/resources/partial - Resources observability HTML."""
         headers = {**self.admin_headers, "HX-Request": "true"}
         with self.client.get(
-            "/admin/observability/resources/partial",
+            "/v1/admin/observability/resources/partial",
             headers=headers,
-            name="/admin/observability/resources/partial",
+            name="/v1/admin/observability/resources/partial",
             catch_response=True,
         ) as response:
             self._validate_html_response(response)
@@ -4495,9 +4495,9 @@ class AdminObservabilityExtendedUser(BaseUser):
     def observability_resources_performance(self):
         """GET /admin/observability/resources/performance - Resource performance."""
         with self.client.get(
-            "/admin/observability/resources/performance",
+            "/v1/admin/observability/resources/performance",
             headers=self.auth_headers,
-            name="/admin/observability/resources/performance",
+            name="/v1/admin/observability/resources/performance",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 500])
@@ -4507,9 +4507,9 @@ class AdminObservabilityExtendedUser(BaseUser):
     def observability_resources_usage(self):
         """GET /admin/observability/resources/usage - Resource usage."""
         with self.client.get(
-            "/admin/observability/resources/usage",
+            "/v1/admin/observability/resources/usage",
             headers=self.auth_headers,
-            name="/admin/observability/resources/usage",
+            name="/v1/admin/observability/resources/usage",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 500])
@@ -4519,9 +4519,9 @@ class AdminObservabilityExtendedUser(BaseUser):
     def observability_tools_chains(self):
         """GET /admin/observability/tools/chains - Tool invocation chains."""
         with self.client.get(
-            "/admin/observability/tools/chains",
+            "/v1/admin/observability/tools/chains",
             headers=self.auth_headers,
-            name="/admin/observability/tools/chains",
+            name="/v1/admin/observability/tools/chains",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 500])
@@ -4531,9 +4531,9 @@ class AdminObservabilityExtendedUser(BaseUser):
     def observability_tools_errors(self):
         """GET /admin/observability/tools/errors - Tool errors."""
         with self.client.get(
-            "/admin/observability/tools/errors",
+            "/v1/admin/observability/tools/errors",
             headers=self.auth_headers,
-            name="/admin/observability/tools/errors",
+            name="/v1/admin/observability/tools/errors",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 500])
@@ -4544,9 +4544,9 @@ class AdminObservabilityExtendedUser(BaseUser):
         """GET /admin/observability/tools/partial - Tools observability HTML."""
         headers = {**self.admin_headers, "HX-Request": "true"}
         with self.client.get(
-            "/admin/observability/tools/partial",
+            "/v1/admin/observability/tools/partial",
             headers=headers,
-            name="/admin/observability/tools/partial",
+            name="/v1/admin/observability/tools/partial",
             catch_response=True,
         ) as response:
             self._validate_html_response(response)
@@ -4556,9 +4556,9 @@ class AdminObservabilityExtendedUser(BaseUser):
     def observability_queries_list(self):
         """GET /admin/observability/queries - List saved queries."""
         with self.client.get(
-            "/admin/observability/queries",
+            "/v1/admin/observability/queries",
             headers=self.auth_headers,
-            name="/admin/observability/queries",
+            name="/v1/admin/observability/queries",
             catch_response=True,
         ) as response:
             self._validate_json_response(response, allowed_codes=[200, 500])
@@ -4573,10 +4573,10 @@ class AdminObservabilityExtendedUser(BaseUser):
             "filters": {},
         }
         with self.client.post(
-            "/admin/observability/queries",
+            "/v1/admin/observability/queries",
             json=payload,
             headers=self.auth_headers,
-            name="/admin/observability/queries [create]",
+            name="/v1/admin/observability/queries [create]",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 201, 422, 500])
@@ -4605,9 +4605,9 @@ class AdminPerformanceExtendedUser(BaseUser):
     def performance_cache(self):
         """GET /admin/performance/cache - Cache performance stats."""
         with self.client.get(
-            "/admin/performance/cache",
+            "/v1/admin/performance/cache",
             headers=self.auth_headers,
-            name="/admin/performance/cache",
+            name="/v1/admin/performance/cache",
             catch_response=True,
         ) as response:
             self._validate_json_response(response, allowed_codes=[200, 404])
@@ -4617,9 +4617,9 @@ class AdminPerformanceExtendedUser(BaseUser):
     def performance_history(self):
         """GET /admin/performance/history - Performance history."""
         with self.client.get(
-            "/admin/performance/history",
+            "/v1/admin/performance/history",
             headers=self.auth_headers,
-            name="/admin/performance/history",
+            name="/v1/admin/performance/history",
             catch_response=True,
         ) as response:
             self._validate_json_response(response, allowed_codes=[200, 404])
@@ -4629,9 +4629,9 @@ class AdminPerformanceExtendedUser(BaseUser):
     def performance_requests(self):
         """GET /admin/performance/requests - Request performance stats."""
         with self.client.get(
-            "/admin/performance/requests",
+            "/v1/admin/performance/requests",
             headers=self.auth_headers,
-            name="/admin/performance/requests",
+            name="/v1/admin/performance/requests",
             catch_response=True,
         ) as response:
             self._validate_json_response(response, allowed_codes=[200, 404])
@@ -4641,9 +4641,9 @@ class AdminPerformanceExtendedUser(BaseUser):
     def performance_system(self):
         """GET /admin/performance/system - System performance metrics."""
         with self.client.get(
-            "/admin/performance/system",
+            "/v1/admin/performance/system",
             headers=self.auth_headers,
-            name="/admin/performance/system",
+            name="/v1/admin/performance/system",
             catch_response=True,
         ) as response:
             self._validate_json_response(response, allowed_codes=[200, 404])
@@ -4653,9 +4653,9 @@ class AdminPerformanceExtendedUser(BaseUser):
     def performance_workers(self):
         """GET /admin/performance/workers - Worker performance stats."""
         with self.client.get(
-            "/admin/performance/workers",
+            "/v1/admin/performance/workers",
             headers=self.auth_headers,
-            name="/admin/performance/workers",
+            name="/v1/admin/performance/workers",
             catch_response=True,
         ) as response:
             self._validate_json_response(response, allowed_codes=[200, 404])
@@ -4681,9 +4681,9 @@ class AdminPluginsUser(BaseUser):
     def list_plugins(self):
         """GET /admin/plugins - List all plugins."""
         with self.client.get(
-            "/admin/plugins",
+            "/v1/admin/plugins",
             headers=self.auth_headers,
-            name="/admin/plugins",
+            name="/v1/admin/plugins",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -4693,9 +4693,9 @@ class AdminPluginsUser(BaseUser):
     def plugins_stats(self):
         """GET /admin/plugins/stats - Plugin statistics."""
         with self.client.get(
-            "/admin/plugins/stats",
+            "/v1/admin/plugins/stats",
             headers=self.auth_headers,
-            name="/admin/plugins/stats",
+            name="/v1/admin/plugins/stats",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -4706,9 +4706,9 @@ class AdminPluginsUser(BaseUser):
         """GET /admin/plugins/partial - Plugins HTML partial."""
         headers = {**self.admin_headers, "HX-Request": "true"}
         with self.client.get(
-            "/admin/plugins/partial",
+            "/v1/admin/plugins/partial",
             headers=headers,
-            name="/admin/plugins/partial",
+            name="/v1/admin/plugins/partial",
             catch_response=True,
         ) as response:
             self._validate_html_response(response)
@@ -4720,9 +4720,9 @@ class AdminPluginsUser(BaseUser):
         plugin_names = ["VaultPlugin", "RateLimiterPlugin", "CircuitBreaker", "DenyListPlugin"]
         name = random.choice(plugin_names)
         with self.client.get(
-            f"/admin/plugins/{name}",
+            f"/v1/admin/plugins/{name}",
             headers=self.auth_headers,
-            name="/admin/plugins/[name]",
+            name="/v1/admin/plugins/[name]",
             catch_response=True,
         ) as response:
             # 200=Success, 404=Plugin not found
@@ -4755,9 +4755,9 @@ class AdminSystemExtendedUser(BaseUser):
     def system_stats(self):
         """GET /admin/system/stats - System-wide statistics."""
         with self.client.get(
-            "/admin/system/stats",
+            "/v1/admin/system/stats",
             headers=self.auth_headers,
-            name="/admin/system/stats",
+            name="/v1/admin/system/stats",
             catch_response=True,
         ) as response:
             self._validate_json_response(response, allowed_codes=[200, 500])
@@ -4767,9 +4767,9 @@ class AdminSystemExtendedUser(BaseUser):
     def admin_tags(self):
         """GET /admin/tags - Admin tags list."""
         with self.client.get(
-            "/admin/tags",
+            "/v1/admin/tags",
             headers=self.auth_headers,
-            name="/admin/tags",
+            name="/v1/admin/tags",
             catch_response=True,
         ) as response:
             # 500 can return non-JSON "Internal Server Error" text
@@ -4780,9 +4780,9 @@ class AdminSystemExtendedUser(BaseUser):
     def admin_well_known(self):
         """GET /admin/well-known - Well-known file configuration."""
         with self.client.get(
-            "/admin/well-known",
+            "/v1/admin/well-known",
             headers=self.auth_headers,
-            name="/admin/well-known",
+            name="/v1/admin/well-known",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -4792,9 +4792,9 @@ class AdminSystemExtendedUser(BaseUser):
     def mcp_pool_metrics(self):
         """GET /admin/mcp-pool/metrics - MCP connection pool metrics."""
         with self.client.get(
-            "/admin/mcp-pool/metrics",
+            "/v1/admin/mcp-pool/metrics",
             headers=self.auth_headers,
-            name="/admin/mcp-pool/metrics",
+            name="/v1/admin/mcp-pool/metrics",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -4804,9 +4804,9 @@ class AdminSystemExtendedUser(BaseUser):
     def mcp_registry_servers(self):
         """GET /admin/mcp-registry/servers - List MCP registry servers."""
         with self.client.get(
-            "/admin/mcp-registry/servers",
+            "/v1/admin/mcp-registry/servers",
             headers=self.auth_headers,
-            name="/admin/mcp-registry/servers",
+            name="/v1/admin/mcp-registry/servers",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -4817,9 +4817,9 @@ class AdminSystemExtendedUser(BaseUser):
         """GET /admin/mcp-registry/partial - Registry HTML partial."""
         headers = {**self.admin_headers, "HX-Request": "true"}
         with self.client.get(
-            "/admin/mcp-registry/partial",
+            "/v1/admin/mcp-registry/partial",
             headers=headers,
-            name="/admin/mcp-registry/partial",
+            name="/v1/admin/mcp-registry/partial",
             catch_response=True,
         ) as response:
             self._validate_html_response(response)
@@ -4830,9 +4830,9 @@ class AdminSystemExtendedUser(BaseUser):
         """GET /admin/maintenance/partial - Maintenance HTML partial."""
         headers = {**self.admin_headers, "HX-Request": "true"}
         with self.client.get(
-            "/admin/maintenance/partial",
+            "/v1/admin/maintenance/partial",
             headers=headers,
-            name="/admin/maintenance/partial",
+            name="/v1/admin/maintenance/partial",
             catch_response=True,
         ) as response:
             self._validate_html_response(response)
@@ -4843,9 +4843,9 @@ class AdminSystemExtendedUser(BaseUser):
         """GET /admin/overview/partial - Dashboard overview HTML."""
         headers = {**self.admin_headers, "HX-Request": "true"}
         with self.client.get(
-            "/admin/overview/partial",
+            "/v1/admin/overview/partial",
             headers=headers,
-            name="/admin/overview/partial",
+            name="/v1/admin/overview/partial",
             catch_response=True,
         ) as response:
             self._validate_html_response(response)
@@ -4855,9 +4855,9 @@ class AdminSystemExtendedUser(BaseUser):
     def change_password_required(self):
         """GET /admin/change-password-required - Check password change requirement."""
         with self.client.get(
-            "/admin/change-password-required",
+            "/v1/admin/change-password-required",
             headers=self.admin_headers,
-            name="/admin/change-password-required",
+            name="/v1/admin/change-password-required",
             catch_response=True,
         ) as response:
             self._validate_status(response)
@@ -4868,9 +4868,9 @@ class AdminSystemExtendedUser(BaseUser):
         """GET /admin/tool-ops/partial - Tool operations HTML partial."""
         headers = {**self.admin_headers, "HX-Request": "true"}
         with self.client.get(
-            "/admin/tool-ops/partial",
+            "/v1/admin/tool-ops/partial",
             headers=headers,
-            name="/admin/tool-ops/partial",
+            name="/v1/admin/tool-ops/partial",
             catch_response=True,
         ) as response:
             self._validate_html_response(response)
@@ -4897,9 +4897,9 @@ class AdminSectionsUser(BaseUser):
         """GET /admin/sections/gateways - Gateways section HTML."""
         headers = {**self.admin_headers, "HX-Request": "true"}
         with self.client.get(
-            "/admin/sections/gateways",
+            "/v1/admin/sections/gateways",
             headers=headers,
-            name="/admin/sections/gateways",
+            name="/v1/admin/sections/gateways",
             catch_response=True,
         ) as response:
             # May return HTML or JSON depending on config
@@ -4911,9 +4911,9 @@ class AdminSectionsUser(BaseUser):
         """GET /admin/sections/servers - Servers section HTML."""
         headers = {**self.admin_headers, "HX-Request": "true"}
         with self.client.get(
-            "/admin/sections/servers",
+            "/v1/admin/sections/servers",
             headers=headers,
-            name="/admin/sections/servers",
+            name="/v1/admin/sections/servers",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 500])
@@ -4924,9 +4924,9 @@ class AdminSectionsUser(BaseUser):
         """GET /admin/sections/prompts - Prompts section HTML."""
         headers = {**self.admin_headers, "HX-Request": "true"}
         with self.client.get(
-            "/admin/sections/prompts",
+            "/v1/admin/sections/prompts",
             headers=headers,
-            name="/admin/sections/prompts",
+            name="/v1/admin/sections/prompts",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 500])
@@ -4937,9 +4937,9 @@ class AdminSectionsUser(BaseUser):
         """GET /admin/sections/resources - Resources section HTML."""
         headers = {**self.admin_headers, "HX-Request": "true"}
         with self.client.get(
-            "/admin/sections/resources",
+            "/v1/admin/sections/resources",
             headers=headers,
-            name="/admin/sections/resources",
+            name="/v1/admin/sections/resources",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 500])
@@ -4975,9 +4975,9 @@ class AdminSearchUser(BaseUser):
     def search_tools(self):
         """GET /admin/tools/search - Search tools."""
         with self.client.get(
-            "/admin/tools/search?q=test",
+            "/v1/admin/tools/search?q=test",
             headers=self.auth_headers,
-            name="/admin/tools/search",
+            name="/v1/admin/tools/search",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -4987,9 +4987,9 @@ class AdminSearchUser(BaseUser):
     def search_servers(self):
         """GET /admin/servers/search - Search servers."""
         with self.client.get(
-            "/admin/servers/search?q=test",
+            "/v1/admin/servers/search?q=test",
             headers=self.auth_headers,
-            name="/admin/servers/search",
+            name="/v1/admin/servers/search",
             catch_response=True,
         ) as response:
             # 404 can occur due to routing conflict with /admin/servers/{server_id}
@@ -5000,9 +5000,9 @@ class AdminSearchUser(BaseUser):
     def search_gateways(self):
         """GET /admin/gateways/search - Search gateways."""
         with self.client.get(
-            "/admin/gateways/search?q=test",
+            "/v1/admin/gateways/search?q=test",
             headers=self.auth_headers,
-            name="/admin/gateways/search",
+            name="/v1/admin/gateways/search",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -5012,9 +5012,9 @@ class AdminSearchUser(BaseUser):
     def search_resources(self):
         """GET /admin/resources/search - Search resources."""
         with self.client.get(
-            "/admin/resources/search?q=test",
+            "/v1/admin/resources/search?q=test",
             headers=self.auth_headers,
-            name="/admin/resources/search",
+            name="/v1/admin/resources/search",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -5024,9 +5024,9 @@ class AdminSearchUser(BaseUser):
     def search_prompts(self):
         """GET /admin/prompts/search - Search prompts."""
         with self.client.get(
-            "/admin/prompts/search?q=test",
+            "/v1/admin/prompts/search?q=test",
             headers=self.auth_headers,
-            name="/admin/prompts/search",
+            name="/v1/admin/prompts/search",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -5036,9 +5036,9 @@ class AdminSearchUser(BaseUser):
     def search_a2a(self):
         """GET /admin/a2a/search - Search A2A agents."""
         with self.client.get(
-            "/admin/a2a/search?q=test",
+            "/v1/admin/a2a/search?q=test",
             headers=self.auth_headers,
-            name="/admin/a2a/search",
+            name="/v1/admin/a2a/search",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -5048,9 +5048,9 @@ class AdminSearchUser(BaseUser):
     def search_teams(self):
         """GET /admin/teams/search - Search teams."""
         with self.client.get(
-            "/admin/teams/search?q=test",
+            "/v1/admin/teams/search?q=test",
             headers=self.auth_headers,
-            name="/admin/teams/search",
+            name="/v1/admin/teams/search",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -5060,9 +5060,9 @@ class AdminSearchUser(BaseUser):
     def search_users(self):
         """GET /admin/users/search - Search users."""
         with self.client.get(
-            "/admin/users/search?q=test",
+            "/v1/admin/users/search?q=test",
             headers=self.auth_headers,
-            name="/admin/users/search",
+            name="/v1/admin/users/search",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -5072,9 +5072,9 @@ class AdminSearchUser(BaseUser):
     def tools_ids(self):
         """GET /admin/tools/ids - List tool IDs."""
         with self.client.get(
-            "/admin/tools/ids",
+            "/v1/admin/tools/ids",
             headers=self.auth_headers,
-            name="/admin/tools/ids",
+            name="/v1/admin/tools/ids",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -5084,9 +5084,9 @@ class AdminSearchUser(BaseUser):
     def gateways_ids(self):
         """GET /admin/gateways/ids - List gateway IDs."""
         with self.client.get(
-            "/admin/gateways/ids",
+            "/v1/admin/gateways/ids",
             headers=self.auth_headers,
-            name="/admin/gateways/ids",
+            name="/v1/admin/gateways/ids",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -5096,9 +5096,9 @@ class AdminSearchUser(BaseUser):
     def resources_ids(self):
         """GET /admin/resources/ids - List resource IDs."""
         with self.client.get(
-            "/admin/resources/ids",
+            "/v1/admin/resources/ids",
             headers=self.auth_headers,
-            name="/admin/resources/ids",
+            name="/v1/admin/resources/ids",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -5108,9 +5108,9 @@ class AdminSearchUser(BaseUser):
     def prompts_ids(self):
         """GET /admin/prompts/ids - List prompt IDs."""
         with self.client.get(
-            "/admin/prompts/ids",
+            "/v1/admin/prompts/ids",
             headers=self.auth_headers,
-            name="/admin/prompts/ids",
+            name="/v1/admin/prompts/ids",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -5120,9 +5120,9 @@ class AdminSearchUser(BaseUser):
     def a2a_ids(self):
         """GET /admin/a2a/ids - List A2A agent IDs."""
         with self.client.get(
-            "/admin/a2a/ids",
+            "/v1/admin/a2a/ids",
             headers=self.auth_headers,
-            name="/admin/a2a/ids",
+            name="/v1/admin/a2a/ids",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -5132,9 +5132,9 @@ class AdminSearchUser(BaseUser):
     def teams_ids(self):
         """GET /admin/teams/ids - List team IDs."""
         with self.client.get(
-            "/admin/teams/ids",
+            "/v1/admin/teams/ids",
             headers=self.auth_headers,
-            name="/admin/teams/ids",
+            name="/v1/admin/teams/ids",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -5144,9 +5144,9 @@ class AdminSearchUser(BaseUser):
     def servers_ids(self):
         """GET /admin/servers/ids - List server IDs."""
         with self.client.get(
-            "/admin/servers/ids",
+            "/v1/admin/servers/ids",
             headers=self.auth_headers,
-            name="/admin/servers/ids",
+            name="/v1/admin/servers/ids",
             catch_response=True,
         ) as response:
             # Note: may return 404 due to routing conflict with /admin/servers/{server_id}
@@ -5174,9 +5174,9 @@ class AdminCacheConfigUser(BaseUser):
     def a2a_cache_stats(self):
         """GET /admin/cache/a2a-stats/stats - A2A cache statistics."""
         with self.client.get(
-            "/admin/cache/a2a-stats/stats",
+            "/v1/admin/cache/a2a-stats/stats",
             headers=self.auth_headers,
-            name="/admin/cache/a2a-stats/stats",
+            name="/v1/admin/cache/a2a-stats/stats",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 500])
@@ -5186,9 +5186,9 @@ class AdminCacheConfigUser(BaseUser):
     def a2a_cache_invalidate(self):
         """POST /admin/cache/a2a-stats/invalidate - Invalidate A2A cache."""
         with self.client.post(
-            "/admin/cache/a2a-stats/invalidate",
+            "/v1/admin/cache/a2a-stats/invalidate",
             headers=self.auth_headers,
-            name="/admin/cache/a2a-stats/invalidate",
+            name="/v1/admin/cache/a2a-stats/invalidate",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 500])
@@ -5198,9 +5198,9 @@ class AdminCacheConfigUser(BaseUser):
     def get_passthrough_headers(self):
         """GET /admin/config/passthrough-headers - Get passthrough headers config."""
         with self.client.get(
-            "/admin/config/passthrough-headers",
+            "/v1/admin/config/passthrough-headers",
             headers=self.auth_headers,
-            name="/admin/config/passthrough-headers",
+            name="/v1/admin/config/passthrough-headers",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 500])
@@ -5210,9 +5210,9 @@ class AdminCacheConfigUser(BaseUser):
     def passthrough_cache_stats(self):
         """GET /admin/config/passthrough-headers/cache-stats - Header cache stats."""
         with self.client.get(
-            "/admin/config/passthrough-headers/cache-stats",
+            "/v1/admin/config/passthrough-headers/cache-stats",
             headers=self.auth_headers,
-            name="/admin/config/passthrough-headers/cache-stats",
+            name="/v1/admin/config/passthrough-headers/cache-stats",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 500])
@@ -5222,9 +5222,9 @@ class AdminCacheConfigUser(BaseUser):
     def passthrough_cache_invalidate(self):
         """POST /admin/config/passthrough-headers/invalidate-cache - Invalidate header cache."""
         with self.client.post(
-            "/admin/config/passthrough-headers/invalidate-cache",
+            "/v1/admin/config/passthrough-headers/invalidate-cache",
             headers=self.auth_headers,
-            name="/admin/config/passthrough-headers/invalidate-cache",
+            name="/v1/admin/config/passthrough-headers/invalidate-cache",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 500])
@@ -5251,9 +5251,9 @@ class AdminHTMXPartialsUser(BaseUser):
         """GET /admin/a2a/partial - A2A agents HTML partial."""
         headers = {**self.admin_headers, "HX-Request": "true"}
         with self.client.get(
-            "/admin/a2a/partial",
+            "/v1/admin/a2a/partial",
             headers=headers,
-            name="/admin/a2a/partial",
+            name="/v1/admin/a2a/partial",
             catch_response=True,
         ) as response:
             self._validate_html_response(response)
@@ -5264,9 +5264,9 @@ class AdminHTMXPartialsUser(BaseUser):
         """GET /admin/gateways/partial - Gateways HTML partial."""
         headers = {**self.admin_headers, "HX-Request": "true"}
         with self.client.get(
-            "/admin/gateways/partial",
+            "/v1/admin/gateways/partial",
             headers=headers,
-            name="/admin/gateways/partial",
+            name="/v1/admin/gateways/partial",
             catch_response=True,
         ) as response:
             self._validate_html_response(response)
@@ -5277,9 +5277,9 @@ class AdminHTMXPartialsUser(BaseUser):
         """GET /admin/servers/partial - Servers HTML partial."""
         headers = {**self.admin_headers, "HX-Request": "true"}
         with self.client.get(
-            "/admin/servers/partial",
+            "/v1/admin/servers/partial",
             headers=headers,
-            name="/admin/servers/partial",
+            name="/v1/admin/servers/partial",
             catch_response=True,
         ) as response:
             self._validate_html_response(response)
@@ -5290,9 +5290,9 @@ class AdminHTMXPartialsUser(BaseUser):
         """GET /admin/teams/partial - Teams HTML partial."""
         headers = {**self.admin_headers, "HX-Request": "true"}
         with self.client.get(
-            "/admin/teams/partial",
+            "/v1/admin/teams/partial",
             headers=headers,
-            name="/admin/teams/partial",
+            name="/v1/admin/teams/partial",
             catch_response=True,
         ) as response:
             self._validate_html_response(response)
@@ -5318,9 +5318,9 @@ class GatewayExtendedUser(BaseUser):
         if GATEWAY_IDS:
             gw_id = random.choice(GATEWAY_IDS)
             with self.client.post(
-                f"/gateways/{gw_id}/toggle",
+                f"/v1/gateways/{gw_id}/toggle",
                 headers=self.auth_headers,
-                name="/gateways/[id]/toggle",
+                name="/v1/gateways/[id]/toggle",
                 catch_response=True,
             ) as response:
                 self._validate_json_response(response, allowed_codes=[200, 401, 404, *INFRASTRUCTURE_ERROR_CODES])
@@ -5332,9 +5332,9 @@ class GatewayExtendedUser(BaseUser):
         if GATEWAY_IDS:
             gw_id = random.choice(GATEWAY_IDS)
             with self.client.post(
-                f"/gateways/{gw_id}/tools/refresh",
+                f"/v1/gateways/{gw_id}/tools/refresh",
                 headers=self.auth_headers,
-                name="/gateways/[id]/tools/refresh",
+                name="/v1/gateways/[id]/tools/refresh",
                 catch_response=True,
             ) as response:
                 self._validate_json_response(response, allowed_codes=[200, 404, 409, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -5359,10 +5359,10 @@ class ResourcesSubscribeUser(BaseUser):
         """POST /resources/subscribe - Subscribe to resource changes."""
         payload = {"uri": f"test://resource-{uuid.uuid4().hex[:8]}"}
         with self.client.post(
-            "/resources/subscribe",
+            "/v1/resources/subscribe",
             json=payload,
             headers=self.auth_headers,
-            name="/resources/subscribe",
+            name="/v1/resources/subscribe",
             catch_response=True,
         ) as response:
             self._validate_status(response)
@@ -5372,9 +5372,9 @@ class ResourcesSubscribeUser(BaseUser):
     def roots_changes(self):
         """GET /roots/changes - Get root change notifications."""
         with self.client.get(
-            "/roots/changes",
+            "/v1/roots/changes",
             headers=self.auth_headers,
-            name="/roots/changes",
+            name="/v1/roots/changes",
             catch_response=True,
         ) as response:
             self._validate_status(response)
@@ -5413,9 +5413,9 @@ class LoggingMetricsUser(BaseUser):
     def prometheus_metrics(self):
         """GET /metrics/prometheus - Prometheus-format metrics."""
         with self.client.get(
-            "/metrics/prometheus",
+            "/v1/metrics/prometheus",
             headers=self.auth_headers,
-            name="/metrics/prometheus",
+            name="/v1/metrics/prometheus",
             catch_response=True,
         ) as response:
             self._validate_status(response)
@@ -5425,9 +5425,9 @@ class LoggingMetricsUser(BaseUser):
     def reset_metrics(self):
         """POST /metrics/reset - Reset all metrics counters."""
         with self.client.post(
-            "/metrics/reset",
+            "/v1/metrics/reset",
             headers=self.auth_headers,
-            name="/metrics/reset",
+            name="/v1/metrics/reset",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -5451,9 +5451,9 @@ class AdminGrpcUser(BaseUser):
     def list_grpc_services(self):
         """GET /admin/grpc - List gRPC services."""
         with self.client.get(
-            "/admin/grpc",
+            "/v1/admin/grpc",
             headers=self.auth_headers,
-            name="/admin/grpc",
+            name="/v1/admin/grpc",
             catch_response=True,
         ) as response:
             self._validate_json_response(response, allowed_codes=[200, 404])
@@ -5517,9 +5517,9 @@ class AuthEmailExtendedUser(BaseUser):
     def auth_email_me(self):
         """GET /auth/email/me - Get current user profile."""
         with self.client.get(
-            "/auth/email/me",
+            "/v1/auth/email/me",
             headers=self.auth_headers,
-            name="/auth/email/me",
+            name="/v1/auth/email/me",
             catch_response=True,
         ) as response:
             # 200=Success, 401=Not email-authenticated, 422=Validation error
@@ -5530,10 +5530,10 @@ class AuthEmailExtendedUser(BaseUser):
     def auth_login(self):
         """POST /auth/login - JWT-based login."""
         with self.client.post(
-            "/auth/login",
+            "/v1/auth/login",
             json={},
             headers=self.auth_headers,
-            name="/auth/login",
+            name="/v1/auth/login",
             catch_response=True,
         ) as response:
             self._validate_json_response(response, allowed_codes=[200, 401, 403, 422])
@@ -5557,9 +5557,9 @@ class AdminLoginLogoutUser(BaseUser):
     def admin_login_page(self):
         """GET /admin/login - Admin login page."""
         with self.client.get(
-            "/admin/login",
+            "/v1/admin/login",
             headers=self.admin_headers,
-            name="/admin/login",
+            name="/v1/admin/login",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 302])
@@ -5569,9 +5569,9 @@ class AdminLoginLogoutUser(BaseUser):
     def admin_logout(self):
         """GET /admin/logout - Admin logout."""
         with self.client.get(
-            "/admin/logout",
+            "/v1/admin/logout",
             headers=self.admin_headers,
-            name="/admin/logout",
+            name="/v1/admin/logout",
             catch_response=True,
         ) as response:
             # Typically redirects to login page
@@ -5597,9 +5597,9 @@ class AdminLogsExtendedUser(BaseUser):
     def logs_export(self):
         """GET /admin/logs/export - Export logs."""
         with self.client.get(
-            "/admin/logs/export",
+            "/v1/admin/logs/export",
             headers=self.auth_headers,
-            name="/admin/logs/export",
+            name="/v1/admin/logs/export",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 404, 500])
@@ -5609,9 +5609,9 @@ class AdminLogsExtendedUser(BaseUser):
     def logs_file(self):
         """GET /admin/logs/file - Get log file contents."""
         with self.client.get(
-            "/admin/logs/file",
+            "/v1/admin/logs/file",
             headers=self.auth_headers,
-            name="/admin/logs/file",
+            name="/v1/admin/logs/file",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 404, 500])
@@ -5621,9 +5621,9 @@ class AdminLogsExtendedUser(BaseUser):
     def logs_stream_probe(self):
         """GET /admin/logs/stream - Logs stream endpoint probe."""
         with self.client.get(
-            "/admin/logs/stream",
+            "/v1/admin/logs/stream",
             headers={"Accept": "application/json"},
-            name="/admin/logs/stream",
+            name="/v1/admin/logs/stream",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 401, 403, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -5648,9 +5648,9 @@ class AdminLLMExtendedUser(BaseUser):
     def llm_api_info(self):
         """GET /admin/llm/api-info/html - LLM API info page."""
         with self.client.get(
-            "/admin/llm/api-info/html",
+            "/v1/admin/llm/api-info/html",
             headers=self.admin_headers,
-            name="/admin/llm/api-info/html",
+            name="/v1/admin/llm/api-info/html",
             catch_response=True,
         ) as response:
             self._validate_html_response(response)
@@ -5660,9 +5660,9 @@ class AdminLLMExtendedUser(BaseUser):
     def llm_models_html(self):
         """GET /admin/llm/models/html - LLM models admin page."""
         with self.client.get(
-            "/admin/llm/models/html",
+            "/v1/admin/llm/models/html",
             headers=self.admin_headers,
-            name="/admin/llm/models/html",
+            name="/v1/admin/llm/models/html",
             catch_response=True,
         ) as response:
             self._validate_html_response(response)
@@ -5672,9 +5672,9 @@ class AdminLLMExtendedUser(BaseUser):
     def llm_providers_html(self):
         """GET /admin/llm/providers/html - LLM providers admin page."""
         with self.client.get(
-            "/admin/llm/providers/html",
+            "/v1/admin/llm/providers/html",
             headers=self.admin_headers,
-            name="/admin/llm/providers/html",
+            name="/v1/admin/llm/providers/html",
             catch_response=True,
         ) as response:
             self._validate_html_response(response)
@@ -5697,9 +5697,9 @@ class AdminSupportBundleUser(BaseUser):
     def generate_support_bundle(self):
         """GET /admin/support-bundle/generate - Generate support bundle."""
         with self.client.get(
-            "/admin/support-bundle/generate",
+            "/v1/admin/support-bundle/generate",
             headers=self.auth_headers,
-            name="/admin/support-bundle/generate",
+            name="/v1/admin/support-bundle/generate",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 404, 500])
@@ -5760,9 +5760,9 @@ class AdminEntityDetailUser(BaseUser):
         if TOOL_IDS:
             tool_id = random.choice(TOOL_IDS)
             with self.client.get(
-                f"/admin/tools/{tool_id}",
+                f"/v1/admin/tools/{tool_id}",
                 headers=self.admin_headers,
-                name="/admin/tools/[id]",
+                name="/v1/admin/tools/[id]",
                 catch_response=True,
             ) as response:
                 self._validate_status(response, allowed_codes=[200, 404])
@@ -5774,9 +5774,9 @@ class AdminEntityDetailUser(BaseUser):
         if SERVER_IDS:
             server_id = random.choice(SERVER_IDS)
             with self.client.get(
-                f"/admin/servers/{server_id}",
+                f"/v1/admin/servers/{server_id}",
                 headers=self.admin_headers,
-                name="/admin/servers/[id]",
+                name="/v1/admin/servers/[id]",
                 catch_response=True,
             ) as response:
                 self._validate_status(response, allowed_codes=[200, 404])
@@ -5788,9 +5788,9 @@ class AdminEntityDetailUser(BaseUser):
         if GATEWAY_IDS:
             gw_id = random.choice(GATEWAY_IDS)
             with self.client.get(
-                f"/admin/gateways/{gw_id}",
+                f"/v1/admin/gateways/{gw_id}",
                 headers=self.admin_headers,
-                name="/admin/gateways/[id]",
+                name="/v1/admin/gateways/[id]",
                 catch_response=True,
             ) as response:
                 self._validate_status(response, allowed_codes=[200, 404])
@@ -5802,9 +5802,9 @@ class AdminEntityDetailUser(BaseUser):
         if RESOURCE_IDS:
             res_id = random.choice(RESOURCE_IDS)
             with self.client.get(
-                f"/admin/resources/{res_id}",
+                f"/v1/admin/resources/{res_id}",
                 headers=self.admin_headers,
-                name="/admin/resources/[id]",
+                name="/v1/admin/resources/[id]",
                 catch_response=True,
             ) as response:
                 self._validate_status(response, allowed_codes=[200, 404])
@@ -5816,9 +5816,9 @@ class AdminEntityDetailUser(BaseUser):
         if PROMPT_IDS:
             prompt_id = random.choice(PROMPT_IDS)
             with self.client.get(
-                f"/admin/prompts/{prompt_id}",
+                f"/v1/admin/prompts/{prompt_id}",
                 headers=self.admin_headers,
-                name="/admin/prompts/[id]",
+                name="/v1/admin/prompts/[id]",
                 catch_response=True,
             ) as response:
                 self._validate_status(response, allowed_codes=[200, 404])
@@ -5828,9 +5828,9 @@ class AdminEntityDetailUser(BaseUser):
     def admin_users_list(self):
         """GET /admin/users - Admin user list."""
         with self.client.get(
-            "/admin/users",
+            "/v1/admin/users",
             headers=self.admin_headers,
-            name="/admin/users",
+            name="/v1/admin/users",
             catch_response=True,
         ) as response:
             self._validate_status(response)
@@ -5840,9 +5840,9 @@ class AdminEntityDetailUser(BaseUser):
     def admin_import_status(self):
         """GET /admin/import/status - Import status list."""
         with self.client.get(
-            "/admin/import/status",
+            "/v1/admin/import/status",
             headers=self.auth_headers,
-            name="/admin/import/status",
+            name="/v1/admin/import/status",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -5865,9 +5865,9 @@ class AdminMetricsResetUser(BaseUser):
     def admin_metrics_reset(self):
         """POST /admin/metrics/reset - Reset admin metrics."""
         with self.client.post(
-            "/admin/metrics/reset",
+            "/v1/admin/metrics/reset",
             headers=self.auth_headers,
-            name="/admin/metrics/reset",
+            name="/v1/admin/metrics/reset",
             catch_response=True,
         ) as response:
             self._validate_json_response(response)
@@ -5891,7 +5891,7 @@ class A2AStateToggleUser(BaseUser):
         super().on_start()
         self.a2a_ids: list[str] = []
         with self.client.get(
-            "/a2a",
+            "/v1/a2a",
             headers=self.auth_headers,
             name="/a2a [setup]",
             catch_response=True,
@@ -5917,10 +5917,10 @@ class A2AStateToggleUser(BaseUser):
         if self.a2a_ids:
             agent_id = random.choice(self.a2a_ids)
             with self.client.post(
-                f"/a2a/{agent_id}/state",
+                f"/v1/a2a/{agent_id}/state",
                 json={"enabled": True},
                 headers=self.auth_headers,
-                name="/a2a/[id]/state",
+                name="/v1/a2a/[id]/state",
                 catch_response=True,
             ) as response:
                 self._validate_json_response(response, allowed_codes=[200, 401, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -5932,9 +5932,9 @@ class A2AStateToggleUser(BaseUser):
         if self.a2a_ids:
             agent_id = random.choice(self.a2a_ids)
             with self.client.post(
-                f"/a2a/{agent_id}/toggle",
+                f"/v1/a2a/{agent_id}/toggle",
                 headers=self.auth_headers,
-                name="/a2a/[id]/toggle",
+                name="/v1/a2a/[id]/toggle",
                 catch_response=True,
             ) as response:
                 # 401 is expected: deprecated endpoint has auth issues
@@ -5963,9 +5963,9 @@ class AdminTeamsMembershipUser(BaseUser):
         super().on_start()
         self.team_ids: list[str] = []
         with self.client.get(
-            "/teams/",
+            "/v1/teams/",
             headers=self.auth_headers,
-            name="/teams/ [setup]",
+            name="/v1/teams/ [setup]",
             catch_response=True,
         ) as response:
             if response.status_code == 200:
@@ -5989,9 +5989,9 @@ class AdminTeamsMembershipUser(BaseUser):
         if self.team_ids:
             tid = random.choice(self.team_ids)
             with self.client.get(
-                f"/admin/teams/{tid}/edit",
+                f"/v1/admin/teams/{tid}/edit",
                 headers=self.admin_headers,
-                name="/admin/teams/[id]/edit",
+                name="/v1/admin/teams/[id]/edit",
                 catch_response=True,
             ) as response:
                 self._validate_status(response, allowed_codes=[200, 404])
@@ -6003,9 +6003,9 @@ class AdminTeamsMembershipUser(BaseUser):
         if self.team_ids:
             tid = random.choice(self.team_ids)
             with self.client.get(
-                f"/admin/teams/{tid}/members",
+                f"/v1/admin/teams/{tid}/members",
                 headers=self.admin_headers,
-                name="/admin/teams/[id]/members",
+                name="/v1/admin/teams/[id]/members",
                 catch_response=True,
             ) as response:
                 self._validate_status(response, allowed_codes=[200, 404])
@@ -6017,9 +6017,9 @@ class AdminTeamsMembershipUser(BaseUser):
         if self.team_ids:
             tid = random.choice(self.team_ids)
             with self.client.get(
-                f"/admin/teams/{tid}/join-requests",
+                f"/v1/admin/teams/{tid}/join-requests",
                 headers=self.admin_headers,
-                name="/admin/teams/[id]/join-requests",
+                name="/v1/admin/teams/[id]/join-requests",
                 catch_response=True,
             ) as response:
                 self._validate_status(response, allowed_codes=[200, 404])
@@ -6032,9 +6032,9 @@ class AdminTeamsMembershipUser(BaseUser):
             tid = random.choice(self.team_ids)
             headers = {**self.admin_headers, "HX-Request": "true"}
             with self.client.get(
-                f"/admin/teams/{tid}/members/partial",
+                f"/v1/admin/teams/{tid}/members/partial",
                 headers=headers,
-                name="/admin/teams/[id]/members/partial",
+                name="/v1/admin/teams/[id]/members/partial",
                 catch_response=True,
             ) as response:
                 self._validate_html_response(response, allowed_codes=[200, 404])
@@ -6046,9 +6046,9 @@ class AdminTeamsMembershipUser(BaseUser):
         if self.team_ids:
             tid = random.choice(self.team_ids)
             with self.client.get(
-                f"/admin/teams/{tid}/members/add",
+                f"/v1/admin/teams/{tid}/members/add",
                 headers=self.admin_headers,
-                name="/admin/teams/[id]/members/add",
+                name="/v1/admin/teams/[id]/members/add",
                 catch_response=True,
             ) as response:
                 self._validate_status(response, allowed_codes=[200, 404])
@@ -6061,9 +6061,9 @@ class AdminTeamsMembershipUser(BaseUser):
             tid = random.choice(self.team_ids)
             headers = {**self.admin_headers, "HX-Request": "true"}
             with self.client.get(
-                f"/admin/teams/{tid}/non-members/partial",
+                f"/v1/admin/teams/{tid}/non-members/partial",
                 headers=headers,
-                name="/admin/teams/[id]/non-members/partial",
+                name="/v1/admin/teams/[id]/non-members/partial",
                 catch_response=True,
             ) as response:
                 self._validate_html_response(response, allowed_codes=[200, 404])
@@ -6105,10 +6105,10 @@ class ServerWellKnownUser(BaseUser):
             server_id = random.choice(SERVER_IDS)
             payload = {"jsonrpc": "2.0", "id": str(uuid.uuid4()), "method": "ping", "params": {}}
             with self.client.post(
-                f"/servers/{server_id}/message",
+                f"/v1/servers/{server_id}/message",
                 json=payload,
                 headers=self.auth_headers,
-                name="/servers/[id]/message",
+                name="/v1/servers/[id]/message",
                 catch_response=True,
             ) as response:
                 self._validate_status(response, allowed_codes=[200, 400, 404, 500])
@@ -6119,9 +6119,9 @@ class ServerWellKnownUser(BaseUser):
         """GET /servers/{id}/sse - Server SSE endpoint probe."""
         fake_server_id = f"loadtest-sse-{uuid.uuid4().hex[:8]}"
         with self.client.get(
-            f"/servers/{fake_server_id}/sse",
+            f"/v1/servers/{fake_server_id}/sse",
             headers={"Accept": "application/json"},
-            name="/servers/[id]/sse",
+            name="/v1/servers/[id]/sse",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 401, 403, 404, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -6145,9 +6145,9 @@ class ImportExtendedUser(BaseUser):
     def import_status_detail(self):
         """GET /import/status/{import_id} - Get specific import status."""
         with self.client.get(
-            f"/import/status/{uuid.uuid4().hex[:8]}",
+            f"/v1/import/status/{uuid.uuid4().hex[:8]}",
             headers=self.auth_headers,
-            name="/import/status/[id]",
+            name="/v1/import/status/[id]",
             catch_response=True,
         ) as response:
             # 200=Found, 404=Not found (expected with random ID)
@@ -6159,10 +6159,10 @@ class ImportExtendedUser(BaseUser):
         """POST /admin/import/preview - Preview import."""
         payload = {"data": {"tools": [], "servers": [], "resources": [], "prompts": [], "gateways": [], "roots": []}}
         with self.client.post(
-            "/admin/import/preview",
+            "/v1/admin/import/preview",
             json=payload,
             headers=self.auth_headers,
-            name="/admin/import/preview",
+            name="/v1/admin/import/preview",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 400, 422, 500])
@@ -6314,9 +6314,9 @@ class AdminResourcesTestUser(BaseUser):
     def test_resource(self):
         """GET /admin/resources/test/{resource_uri} - Test resource fetch."""
         with self.client.get(
-            "/admin/resources/test/test://sample",
+            "/v1/admin/resources/test/test://sample",
             headers=self.auth_headers,
-            name="/admin/resources/test/[uri]",
+            name="/v1/admin/resources/test/[uri]",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 404, 500])
@@ -6351,9 +6351,9 @@ class EntityUpdateExtendedUser(BaseUser):
         if SERVER_IDS:
             server_id = random.choice(SERVER_IDS)
             with self.client.get(
-                f"/servers/{server_id}",
+                f"/v1/servers/{server_id}",
                 headers=self.auth_headers,
-                name="/servers/[id] [for update]",
+                name="/v1/servers/[id] [for update]",
                 catch_response=True,
             ) as response:
                 if response.status_code == 200:
@@ -6362,10 +6362,10 @@ class EntityUpdateExtendedUser(BaseUser):
                         data["description"] = f"Updated by load test at {time.time()}"
                         time.sleep(0.05)
                         with self.client.put(
-                            f"/servers/{server_id}",
+                            f"/v1/servers/{server_id}",
                             json=data,
                             headers={**self.auth_headers, "Content-Type": "application/json"},
-                            name="/servers/[id] [update]",
+                            name="/v1/servers/[id] [update]",
                             catch_response=True,
                         ) as put_resp:
                             self._validate_json_response(put_resp, allowed_codes=[200, 403, 404, 409, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -6382,9 +6382,9 @@ class EntityUpdateExtendedUser(BaseUser):
         if PROMPT_IDS:
             prompt_id = random.choice(PROMPT_IDS)
             with self.client.get(
-                f"/prompts/{prompt_id}",
+                f"/v1/prompts/{prompt_id}",
                 headers=self.auth_headers,
-                name="/prompts/[id] [for update]",
+                name="/v1/prompts/[id] [for update]",
                 catch_response=True,
             ) as response:
                 if response.status_code == 200:
@@ -6393,10 +6393,10 @@ class EntityUpdateExtendedUser(BaseUser):
                         data["description"] = f"Updated by load test at {time.time()}"
                         time.sleep(0.05)
                         with self.client.put(
-                            f"/prompts/{prompt_id}",
+                            f"/v1/prompts/{prompt_id}",
                             json=data,
                             headers={**self.auth_headers, "Content-Type": "application/json"},
-                            name="/prompts/[id] [update]",
+                            name="/v1/prompts/[id] [update]",
                             catch_response=True,
                         ) as put_resp:
                             self._validate_json_response(put_resp, allowed_codes=[200, 403, 404, 409, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -6413,7 +6413,7 @@ class EntityUpdateExtendedUser(BaseUser):
         if not A2A_TESTING_ENABLED:
             return
         with self.client.get(
-            "/a2a",
+            "/v1/a2a",
             headers=self.auth_headers,
             name="/a2a [list for update]",
             catch_response=True,
@@ -6451,10 +6451,10 @@ class EntityUpdateExtendedUser(BaseUser):
 
         agent["description"] = f"Updated by load test at {time.time()}"
         with self.client.put(
-            f"/a2a/{agent_id}",
+            f"/v1/a2a/{agent_id}",
             json=agent,
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/a2a/[id] [update]",
+            name="/v1/a2a/[id] [update]",
             catch_response=True,
         ) as put_resp:
             self._validate_json_response(put_resp, allowed_codes=[200, 403, 404, 409, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -6466,9 +6466,9 @@ class EntityUpdateExtendedUser(BaseUser):
         if TEAM_IDS:
             team_id = random.choice(TEAM_IDS)
             with self.client.get(
-                f"/teams/{team_id}",
+                f"/v1/teams/{team_id}",
                 headers=self.auth_headers,
-                name="/teams/[id] [for update]",
+                name="/v1/teams/[id] [for update]",
                 catch_response=True,
             ) as response:
                 if response.status_code == 200:
@@ -6477,10 +6477,10 @@ class EntityUpdateExtendedUser(BaseUser):
                         data["description"] = f"Updated by load test at {time.time()}"
                         time.sleep(0.05)
                         with self.client.put(
-                            f"/teams/{team_id}",
+                            f"/v1/teams/{team_id}",
                             json=data,
                             headers={**self.auth_headers, "Content-Type": "application/json"},
-                            name="/teams/[id] [update]",
+                            name="/v1/teams/[id] [update]",
                             catch_response=True,
                         ) as put_resp:
                             self._validate_json_response(put_resp, allowed_codes=[200, 403, 404, 409, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -6495,7 +6495,7 @@ class EntityUpdateExtendedUser(BaseUser):
     def update_token(self):
         """PUT /tokens/{token_id} - Update a token."""
         with self.client.get(
-            "/tokens",
+            "/v1/tokens",
             headers=self.auth_headers,
             name="/tokens [list for update]",
             catch_response=True,
@@ -6533,10 +6533,10 @@ class EntityUpdateExtendedUser(BaseUser):
 
         update_data = {"name": token.get("name", "token"), "description": f"Updated by load test at {time.time()}"}
         with self.client.put(
-            f"/tokens/{token_id}",
+            f"/v1/tokens/{token_id}",
             json=update_data,
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/tokens/[id] [update]",
+            name="/v1/tokens/[id] [update]",
             catch_response=True,
         ) as put_resp:
             self._validate_json_response(put_resp, allowed_codes=[200, 403, 404, 409, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -6548,9 +6548,9 @@ class EntityUpdateExtendedUser(BaseUser):
         if ROLE_IDS:
             role_id = random.choice(ROLE_IDS)
             with self.client.get(
-                f"/rbac/roles/{role_id}",
+                f"/v1/rbac/roles/{role_id}",
                 headers=self.auth_headers,
-                name="/rbac/roles/[id] [for update]",
+                name="/v1/rbac/roles/[id] [for update]",
                 catch_response=True,
             ) as response:
                 if response.status_code == 200:
@@ -6559,10 +6559,10 @@ class EntityUpdateExtendedUser(BaseUser):
                         data["description"] = f"Updated by load test at {time.time()}"
                         time.sleep(0.05)
                         with self.client.put(
-                            f"/rbac/roles/{role_id}",
+                            f"/v1/rbac/roles/{role_id}",
                             json=data,
                             headers={**self.auth_headers, "Content-Type": "application/json"},
-                            name="/rbac/roles/[id] [update]",
+                            name="/v1/rbac/roles/[id] [update]",
                             catch_response=True,
                         ) as put_resp:
                             self._validate_json_response(put_resp, allowed_codes=[200, 400, 403, 404, 409, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -6605,12 +6605,12 @@ class LLMCRUDUser(BaseUser):
         """Clean up created LLM entities."""
         for model_id in self.created_models:
             try:
-                self.client.delete(f"/llm/models/{model_id}", headers=self.auth_headers, name="/llm/models/[id] [cleanup]")
+                self.client.delete(f"/v1/llm/models/{model_id}", headers=self.auth_headers, name="/v1/llm/models/[id] [cleanup]")
             except Exception:
                 pass
         for provider_id in self.created_providers:
             try:
-                self.client.delete(f"/llm/providers/{provider_id}", headers=self.auth_headers, name="/llm/providers/[id] [cleanup]")
+                self.client.delete(f"/v1/llm/providers/{provider_id}", headers=self.auth_headers, name="/v1/llm/providers/[id] [cleanup]")
             except Exception:
                 pass
 
@@ -6627,10 +6627,10 @@ class LLMCRUDUser(BaseUser):
         }
 
         with self.client.post(
-            "/llm/providers",
+            "/v1/llm/providers",
             json=provider_data,
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/llm/providers [create]",
+            name="/v1/llm/providers [create]",
             catch_response=True,
         ) as response:
             if response.status_code in (200, 201):
@@ -6640,9 +6640,9 @@ class LLMCRUDUser(BaseUser):
                     # GET provider details
                     time.sleep(0.05)
                     with self.client.get(
-                        f"/llm/providers/{provider_id}",
+                        f"/v1/llm/providers/{provider_id}",
                         headers=self.auth_headers,
-                        name="/llm/providers/[id]",
+                        name="/v1/llm/providers/[id]",
                         catch_response=True,
                     ) as provider_get_resp:
                         # Concurrent CRUD can legitimately delete the provider between requests.
@@ -6650,34 +6650,34 @@ class LLMCRUDUser(BaseUser):
                     # PATCH provider
                     time.sleep(0.05)
                     with self.client.patch(
-                        f"/llm/providers/{provider_id}",
+                        f"/v1/llm/providers/{provider_id}",
                         json={"description": f"Patched at {time.time()}"},
                         headers={**self.auth_headers, "Content-Type": "application/json"},
-                        name="/llm/providers/[id] [patch]",
+                        name="/v1/llm/providers/[id] [patch]",
                         catch_response=True,
                     ) as patch_resp:
                         self._validate_status(patch_resp, allowed_codes=[200, 403, 404, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                     # Health check
                     time.sleep(0.05)
                     with self.client.post(
-                        f"/llm/providers/{provider_id}/health",
+                        f"/v1/llm/providers/{provider_id}/health",
                         headers=self.auth_headers,
-                        name="/llm/providers/[id]/health",
+                        name="/v1/llm/providers/[id]/health",
                         catch_response=True,
                     ) as health_resp:
                         self._validate_status(health_resp, allowed_codes=[200, 404, 500, 503, *INFRASTRUCTURE_ERROR_CODES])
                     # Toggle state
                     time.sleep(0.05)
                     with self.client.post(
-                        f"/llm/providers/{provider_id}/state",
+                        f"/v1/llm/providers/{provider_id}/state",
                         headers=self.auth_headers,
-                        name="/llm/providers/[id]/state",
+                        name="/v1/llm/providers/[id]/state",
                         catch_response=True,
                     ) as state_resp:
                         self._validate_status(state_resp, allowed_codes=[200, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                     # Delete
                     time.sleep(0.05)
-                    self.client.delete(f"/llm/providers/{provider_id}", headers=self.auth_headers, name="/llm/providers/[id] [delete]")
+                    self.client.delete(f"/v1/llm/providers/{provider_id}", headers=self.auth_headers, name="/v1/llm/providers/[id] [delete]")
                     response.success()
                 except Exception:
                     response.success()
@@ -6695,10 +6695,10 @@ class LLMCRUDUser(BaseUser):
         }
 
         with self.client.post(
-            "/llm/models",
+            "/v1/llm/models",
             json=model_data,
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/llm/models [create]",
+            name="/v1/llm/models [create]",
             catch_response=True,
         ) as response:
             if response.status_code in (200, 201):
@@ -6707,29 +6707,29 @@ class LLMCRUDUser(BaseUser):
                     model_id = data.get("id") or data.get("model_id") or model_data["model_id"]
                     # GET model details
                     time.sleep(0.05)
-                    self.client.get(f"/llm/models/{model_id}", headers=self.auth_headers, name="/llm/models/[id]")
+                    self.client.get(f"/v1/llm/models/{model_id}", headers=self.auth_headers, name="/v1/llm/models/[id]")
                     # PATCH model
                     time.sleep(0.05)
                     with self.client.patch(
-                        f"/llm/models/{model_id}",
+                        f"/v1/llm/models/{model_id}",
                         json={"description": f"Patched at {time.time()}"},
                         headers={**self.auth_headers, "Content-Type": "application/json"},
-                        name="/llm/models/[id] [patch]",
+                        name="/v1/llm/models/[id] [patch]",
                         catch_response=True,
                     ) as patch_resp:
                         self._validate_status(patch_resp, allowed_codes=[200, 403, 404, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                     # Toggle state
                     time.sleep(0.05)
                     with self.client.post(
-                        f"/llm/models/{model_id}/state",
+                        f"/v1/llm/models/{model_id}/state",
                         headers=self.auth_headers,
-                        name="/llm/models/[id]/state",
+                        name="/v1/llm/models/[id]/state",
                         catch_response=True,
                     ) as state_resp:
                         self._validate_status(state_resp, allowed_codes=[200, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                     # Delete
                     time.sleep(0.05)
-                    self.client.delete(f"/llm/models/{model_id}", headers=self.auth_headers, name="/llm/models/[id] [delete]")
+                    self.client.delete(f"/v1/llm/models/{model_id}", headers=self.auth_headers, name="/v1/llm/models/[id] [delete]")
                     response.success()
                 except Exception:
                     response.success()
@@ -6741,9 +6741,9 @@ class LLMCRUDUser(BaseUser):
     def read_provider_details(self):
         """GET /llm/providers/{provider_id} - Read existing provider."""
         with self.client.get(
-            "/llm/providers",
+            "/v1/llm/providers",
             headers=self.auth_headers,
-            name="/llm/providers [list for read]",
+            name="/v1/llm/providers [list for read]",
             catch_response=True,
         ) as response:
             if response.status_code != 200:
@@ -6760,9 +6760,9 @@ class LLMCRUDUser(BaseUser):
                     pid = provider.get("id")
                     if pid:
                         with self.client.get(
-                            f"/llm/providers/{pid}",
+                            f"/v1/llm/providers/{pid}",
                             headers=self.auth_headers,
-                            name="/llm/providers/[id]",
+                            name="/v1/llm/providers/[id]",
                             catch_response=True,
                         ) as provider_get_resp:
                             self._validate_status(provider_get_resp, allowed_codes=[200, 404, *INFRASTRUCTURE_ERROR_CODES])
@@ -6781,9 +6781,9 @@ class LLMCRUDUser(BaseUser):
     def read_model_details(self):
         """GET /llm/models/{model_id} - Read existing model."""
         with self.client.get(
-            "/llm/models",
+            "/v1/llm/models",
             headers=self.auth_headers,
-            name="/llm/models [list for read]",
+            name="/v1/llm/models [list for read]",
             catch_response=True,
         ) as response:
             if response.status_code != 200:
@@ -6800,9 +6800,9 @@ class LLMCRUDUser(BaseUser):
                     mid = model.get("id") or model.get("model_id")
                     if mid:
                         with self.client.get(
-                            f"/llm/models/{mid}",
+                            f"/v1/llm/models/{mid}",
                             headers=self.auth_headers,
-                            name="/llm/models/[id]",
+                            name="/v1/llm/models/[id]",
                             catch_response=True,
                         ) as model_get_resp:
                             self._validate_status(model_get_resp, allowed_codes=[200, 404, *INFRASTRUCTURE_ERROR_CODES])
@@ -6844,7 +6844,7 @@ class GatewayCRUDExtendedUser(BaseUser):
         """Clean up created gateways."""
         for gw_id in self.created_gateways:
             try:
-                self.client.delete(f"/gateways/{gw_id}", headers=self.auth_headers, name="/gateways/[id] [cleanup]")
+                self.client.delete(f"/v1/gateways/{gw_id}", headers=self.auth_headers, name="/v1/gateways/[id] [cleanup]")
             except Exception:
                 pass
 
@@ -6860,7 +6860,7 @@ class GatewayCRUDExtendedUser(BaseUser):
         }
 
         with self.client.post(
-            "/gateways",
+            "/v1/gateways",
             json=gw_data,
             headers={**self.auth_headers, "Content-Type": "application/json"},
             name="/gateways [create]",
@@ -6873,16 +6873,16 @@ class GatewayCRUDExtendedUser(BaseUser):
                     # Update
                     time.sleep(0.1)
                     with self.client.put(
-                        f"/gateways/{gw_id}",
+                        f"/v1/gateways/{gw_id}",
                         json={**gw_data, "description": f"Updated at {time.time()}"},
                         headers={**self.auth_headers, "Content-Type": "application/json"},
-                        name="/gateways/[id] [update]",
+                        name="/v1/gateways/[id] [update]",
                         catch_response=True,
                     ) as put_resp:
                         self._validate_status(put_resp, allowed_codes=[200, 403, 404, 409, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                     # Delete
                     time.sleep(0.1)
-                    self.client.delete(f"/gateways/{gw_id}", headers=self.auth_headers, name="/gateways/[id] [delete]")
+                    self.client.delete(f"/v1/gateways/{gw_id}", headers=self.auth_headers, name="/v1/gateways/[id] [delete]")
                     response.success()
                 except Exception:
                     response.success()
@@ -6921,10 +6921,10 @@ class AuthEmailCRUDUser(BaseUser):
         }
 
         with self.client.post(
-            "/auth/email/admin/users",
+            "/v1/auth/email/admin/users",
             json=user_data,
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/auth/email/admin/users [create]",
+            name="/v1/auth/email/admin/users [create]",
             catch_response=True,
         ) as response:
             if response.status_code in (200, 201):
@@ -6932,26 +6932,26 @@ class AuthEmailCRUDUser(BaseUser):
                     # GET user
                     time.sleep(0.05)
                     self.client.get(
-                        f"/auth/email/admin/users/{email}",
+                        f"/v1/auth/email/admin/users/{email}",
                         headers=self.auth_headers,
-                        name="/auth/email/admin/users/[email]",
+                        name="/v1/auth/email/admin/users/[email]",
                     )
                     # PUT update
                     time.sleep(0.05)
                     with self.client.put(
-                        f"/auth/email/admin/users/{email}",
+                        f"/v1/auth/email/admin/users/{email}",
                         json={**user_data, "full_name": "Updated Load Test User"},
                         headers={**self.auth_headers, "Content-Type": "application/json"},
-                        name="/auth/email/admin/users/[email] [update]",
+                        name="/v1/auth/email/admin/users/[email] [update]",
                         catch_response=True,
                     ) as put_resp:
                         self._validate_status(put_resp, allowed_codes=[200, 403, 404, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                     # DELETE
                     time.sleep(0.05)
                     self.client.delete(
-                        f"/auth/email/admin/users/{email}",
+                        f"/v1/auth/email/admin/users/{email}",
                         headers=self.auth_headers,
-                        name="/auth/email/admin/users/[email] [delete]",
+                        name="/v1/auth/email/admin/users/[email] [delete]",
                     )
                     response.success()
                 except Exception:
@@ -6964,10 +6964,10 @@ class AuthEmailCRUDUser(BaseUser):
     def email_login(self):
         """POST /auth/email/login - Email login."""
         with self.client.post(
-            "/auth/email/login",
+            "/v1/auth/email/login",
             json={"email": "admin@example.com", "password": "changeme"},
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/auth/email/login",
+            name="/v1/auth/email/login",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 401, 403, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -6978,19 +6978,19 @@ class AuthEmailCRUDUser(BaseUser):
         """POST /auth/email/register - Register then delete."""
         email = f"loadtest-reg-{uuid.uuid4().hex[:8]}@example.com"
         with self.client.post(
-            "/auth/email/register",
+            "/v1/auth/email/register",
             json={"email": email, "password": "LoadTest123!", "full_name": "Load Test"},
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/auth/email/register",
+            name="/v1/auth/email/register",
             catch_response=True,
         ) as response:
             if response.status_code in (200, 201):
                 try:
                     time.sleep(0.05)
                     self.client.delete(
-                        f"/auth/email/admin/users/{email}",
+                        f"/v1/auth/email/admin/users/{email}",
                         headers=self.auth_headers,
-                        name="/auth/email/admin/users/[email] [cleanup]",
+                        name="/v1/auth/email/admin/users/[email] [cleanup]",
                     )
                 except Exception:
                     pass
@@ -7002,10 +7002,10 @@ class AuthEmailCRUDUser(BaseUser):
     def change_password(self):
         """POST /auth/email/change-password - Change password."""
         with self.client.post(
-            "/auth/email/change-password",
+            "/v1/auth/email/change-password",
             json={"current_password": "changeme", "new_password": "changeme"},
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/auth/email/change-password",
+            name="/v1/auth/email/change-password",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 400, 401, 403, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -7044,9 +7044,9 @@ class TeamsExtendedWriteUser(BaseUser):
         if TEAM_IDS:
             team_id = random.choice(TEAM_IDS)
             with self.client.post(
-                f"/teams/{team_id}/join",
+                f"/v1/teams/{team_id}/join",
                 headers=self.auth_headers,
-                name="/teams/[id]/join",
+                name="/v1/teams/[id]/join",
                 catch_response=True,
             ) as response:
                 self._validate_status(response, allowed_codes=[200, 400, 403, 404, 409, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -7058,9 +7058,9 @@ class TeamsExtendedWriteUser(BaseUser):
         if TEAM_IDS:
             team_id = random.choice(TEAM_IDS)
             with self.client.delete(
-                f"/teams/{team_id}/leave",
+                f"/v1/teams/{team_id}/leave",
                 headers=self.auth_headers,
-                name="/teams/[id]/leave",
+                name="/v1/teams/[id]/leave",
                 catch_response=True,
             ) as response:
                 self._validate_status(response, allowed_codes=[200, 400, 403, 404, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -7073,10 +7073,10 @@ class TeamsExtendedWriteUser(BaseUser):
             team_id = random.choice(TEAM_IDS)
             invite_data = {"email": f"loadtest-invite-{uuid.uuid4().hex[:8]}@example.com", "role": "viewer"}
             with self.client.post(
-                f"/teams/{team_id}/invitations",
+                f"/v1/teams/{team_id}/invitations",
                 json=invite_data,
                 headers={**self.auth_headers, "Content-Type": "application/json"},
-                name="/teams/[id]/invitations [create]",
+                name="/v1/teams/[id]/invitations [create]",
                 catch_response=True,
             ) as response:
                 if response.status_code in (200, 201):
@@ -7087,16 +7087,16 @@ class TeamsExtendedWriteUser(BaseUser):
                         if invite_id:
                             time.sleep(0.05)
                             self.client.delete(
-                                f"/teams/invitations/{invite_id}",
+                                f"/v1/teams/invitations/{invite_id}",
                                 headers=self.auth_headers,
-                                name="/teams/invitations/[id] [delete]",
+                                name="/v1/teams/invitations/[id] [delete]",
                             )
                         elif token:
                             time.sleep(0.05)
                             with self.client.post(
-                                f"/teams/invitations/{token}/accept",
+                                f"/v1/teams/invitations/{token}/accept",
                                 headers=self.auth_headers,
-                                name="/teams/invitations/[token]/accept",
+                                name="/v1/teams/invitations/[token]/accept",
                                 catch_response=True,
                             ) as accept_resp:
                                 self._validate_status(accept_resp, allowed_codes=[200, 400, 403, 404, 409, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -7113,9 +7113,9 @@ class TeamsExtendedWriteUser(BaseUser):
         if TEAM_IDS:
             team_id = random.choice(TEAM_IDS)
             with self.client.get(
-                f"/teams/{team_id}/join-requests",
+                f"/v1/teams/{team_id}/join-requests",
                 headers=self.auth_headers,
-                name="/teams/[id]/join-requests [list for manage]",
+                name="/v1/teams/[id]/join-requests [list for manage]",
                 catch_response=True,
             ) as response:
                 if response.status_code == 200:
@@ -7129,17 +7129,17 @@ class TeamsExtendedWriteUser(BaseUser):
                                 # Approve or delete
                                 if random.random() < 0.5:
                                     with self.client.post(
-                                        f"/teams/{team_id}/join-requests/{req_id}/approve",
+                                        f"/v1/teams/{team_id}/join-requests/{req_id}/approve",
                                         headers=self.auth_headers,
-                                        name="/teams/[id]/join-requests/[id]/approve",
+                                        name="/v1/teams/[id]/join-requests/[id]/approve",
                                         catch_response=True,
                                     ) as approve_resp:
                                         self._validate_status(approve_resp, allowed_codes=[200, 403, 404, 409, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                                 else:
                                     with self.client.delete(
-                                        f"/teams/{team_id}/join-requests/{req_id}",
+                                        f"/v1/teams/{team_id}/join-requests/{req_id}",
                                         headers=self.auth_headers,
-                                        name="/teams/[id]/join-requests/[id] [delete]",
+                                        name="/v1/teams/[id]/join-requests/[id] [delete]",
                                         catch_response=True,
                                     ) as del_resp:
                                         self._validate_status(del_resp, allowed_codes=[200, 403, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -7154,9 +7154,9 @@ class TeamsExtendedWriteUser(BaseUser):
         if TEAM_IDS:
             team_id = random.choice(TEAM_IDS)
             with self.client.get(
-                f"/teams/{team_id}/members",
+                f"/v1/teams/{team_id}/members",
                 headers=self.auth_headers,
-                name="/teams/[id]/members [list for manage]",
+                name="/v1/teams/[id]/members [list for manage]",
                 catch_response=True,
             ) as response:
                 if response.status_code == 200:
@@ -7168,10 +7168,10 @@ class TeamsExtendedWriteUser(BaseUser):
                             email = member.get("email") or member.get("user_email")
                             if email and email != "admin@example.com":
                                 with self.client.put(
-                                    f"/teams/{team_id}/members/{email}",
+                                    f"/v1/teams/{team_id}/members/{email}",
                                     json={"role": "viewer"},
                                     headers={**self.auth_headers, "Content-Type": "application/json"},
-                                    name="/teams/[id]/members/[email] [update]",
+                                    name="/v1/teams/[id]/members/[email] [update]",
                                     catch_response=True,
                                 ) as put_resp:
                                     self._validate_status(put_resp, allowed_codes=[200, 403, 404, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -7188,9 +7188,9 @@ class TeamsExtendedWriteUser(BaseUser):
             # Use a fake email to avoid actually removing real members
             fake_email = f"loadtest-{uuid.uuid4().hex[:8]}@example.com"
             with self.client.delete(
-                f"/teams/{team_id}/members/{fake_email}",
+                f"/v1/teams/{team_id}/members/{fake_email}",
                 headers=self.auth_headers,
-                name="/teams/[id]/members/[email] [delete]",
+                name="/v1/teams/[id]/members/[email] [delete]",
                 catch_response=True,
             ) as response:
                 self._validate_status(response, allowed_codes=[200, 400, 403, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -7216,10 +7216,10 @@ class RBACExtendedWriteUser(BaseUser):
         if ROLE_IDS:
             role_id = random.choice(ROLE_IDS)
             with self.client.post(
-                "/rbac/users/admin@example.com/roles",
+                "/v1/rbac/users/admin@example.com/roles",
                 json={"role_id": role_id},
                 headers={**self.auth_headers, "Content-Type": "application/json"},
-                name="/rbac/users/[email]/roles [assign]",
+                name="/v1/rbac/users/[email]/roles [assign]",
                 catch_response=True,
             ) as response:
                 self._validate_status(response, allowed_codes=[200, 400, 403, 404, 409, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -7231,9 +7231,9 @@ class RBACExtendedWriteUser(BaseUser):
         if ROLE_IDS:
             role_id = random.choice(ROLE_IDS)
             with self.client.delete(
-                f"/rbac/users/admin@example.com/roles/{role_id}",
+                f"/v1/rbac/users/admin@example.com/roles/{role_id}",
                 headers=self.auth_headers,
-                name="/rbac/users/[email]/roles/[id] [delete]",
+                name="/v1/rbac/users/[email]/roles/[id] [delete]",
                 catch_response=True,
             ) as response:
                 self._validate_status(response, allowed_codes=[200, 403, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -7258,9 +7258,9 @@ class TokensExtendedWriteUser(BaseUser):
         """DELETE /tokens/admin/{token_id} - Admin delete a token (test with fake ID)."""
         fake_id = f"loadtest-{uuid.uuid4().hex[:8]}"
         with self.client.delete(
-            f"/tokens/admin/{fake_id}",
+            f"/v1/tokens/admin/{fake_id}",
             headers=self.auth_headers,
-            name="/tokens/admin/[id] [delete]",
+            name="/v1/tokens/admin/[id] [delete]",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 403, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -7277,10 +7277,10 @@ class TokensExtendedWriteUser(BaseUser):
                 "expires_in_days": 1,
             }
             with self.client.post(
-                f"/tokens/teams/{team_id}",
+                f"/v1/tokens/teams/{team_id}",
                 json=token_data,
                 headers={**self.auth_headers, "Content-Type": "application/json"},
-                name="/tokens/teams/[id] [create]",
+                name="/v1/tokens/teams/[id] [create]",
                 catch_response=True,
             ) as response:
                 if response.status_code in (200, 201):
@@ -7289,7 +7289,7 @@ class TokensExtendedWriteUser(BaseUser):
                         token_id = data.get("id")
                         if token_id:
                             time.sleep(0.05)
-                            self.client.delete(f"/tokens/{token_id}", headers=self.auth_headers, name="/tokens/[id] [cleanup]")
+                            self.client.delete(f"/v1/tokens/{token_id}", headers=self.auth_headers, name="/v1/tokens/[id] [cleanup]")
                     except Exception:
                         pass
                     response.success()
@@ -7386,9 +7386,9 @@ class AdminDetailReadExtendedUser(BaseUser):
         if A2A_IDS:
             agent_id = random.choice(A2A_IDS)
             with self.client.get(
-                f"/admin/a2a/{agent_id}",
+                f"/v1/admin/a2a/{agent_id}",
                 headers=self.admin_headers,
-                name="/admin/a2a/[id]",
+                name="/v1/admin/a2a/[id]",
                 catch_response=True,
             ) as detail_resp:
                 self._validate_status(detail_resp, allowed_codes=[200, 404, 500])
@@ -7399,9 +7399,9 @@ class AdminDetailReadExtendedUser(BaseUser):
         """GET /admin/grpc/{service_id} - Admin gRPC detail."""
         fake_id = f"loadtest-{uuid.uuid4().hex[:8]}"
         with self.client.get(
-            f"/admin/grpc/{fake_id}",
+            f"/v1/admin/grpc/{fake_id}",
             headers=self.admin_headers,
-            name="/admin/grpc/[id]",
+            name="/v1/admin/grpc/[id]",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 404, 500])
@@ -7412,9 +7412,9 @@ class AdminDetailReadExtendedUser(BaseUser):
         """GET /admin/grpc/{service_id}/methods - Admin gRPC methods."""
         fake_id = f"loadtest-{uuid.uuid4().hex[:8]}"
         with self.client.get(
-            f"/admin/grpc/{fake_id}/methods",
+            f"/v1/admin/grpc/{fake_id}/methods",
             headers=self.admin_headers,
-            name="/admin/grpc/[id]/methods",
+            name="/v1/admin/grpc/[id]/methods",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 404, 500])
@@ -7425,9 +7425,9 @@ class AdminDetailReadExtendedUser(BaseUser):
         """GET /admin/import/status/{import_id} - Import status detail."""
         fake_id = f"loadtest-{uuid.uuid4().hex[:8]}"
         with self.client.get(
-            f"/admin/import/status/{fake_id}",
+            f"/v1/admin/import/status/{fake_id}",
             headers=self.admin_headers,
-            name="/admin/import/status/[id]",
+            name="/v1/admin/import/status/[id]",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 404, 500])
@@ -7439,9 +7439,9 @@ class AdminDetailReadExtendedUser(BaseUser):
         if SERVER_IDS:
             server_id = random.choice(SERVER_IDS)
             with self.client.get(
-                f"/admin/mcp-registry/{server_id}/status",
+                f"/v1/admin/mcp-registry/{server_id}/status",
                 headers=self.admin_headers,
-                name="/admin/mcp-registry/[id]/status",
+                name="/v1/admin/mcp-registry/[id]/status",
                 catch_response=True,
             ) as response:
                 self._validate_status(response, allowed_codes=[200, 404, 500])
@@ -7452,9 +7452,9 @@ class AdminDetailReadExtendedUser(BaseUser):
         """GET /admin/observability/queries/{query_id} - Query detail."""
         fake_id = f"loadtest-{uuid.uuid4().hex[:8]}"
         with self.client.get(
-            f"/admin/observability/queries/{fake_id}",
+            f"/v1/admin/observability/queries/{fake_id}",
             headers=self.admin_headers,
-            name="/admin/observability/queries/[id]",
+            name="/v1/admin/observability/queries/[id]",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 404, 422, 500])
@@ -7465,9 +7465,9 @@ class AdminDetailReadExtendedUser(BaseUser):
         """GET /admin/observability/trace/{trace_id} - Trace detail."""
         fake_id = f"loadtest-{uuid.uuid4().hex[:8]}"
         with self.client.get(
-            f"/admin/observability/trace/{fake_id}",
+            f"/v1/admin/observability/trace/{fake_id}",
             headers=self.admin_headers,
-            name="/admin/observability/trace/[id]",
+            name="/v1/admin/observability/trace/[id]",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 404, 500])
@@ -7477,9 +7477,9 @@ class AdminDetailReadExtendedUser(BaseUser):
     def admin_user_edit(self):
         """GET /admin/users/{user_email}/edit - User edit form."""
         with self.client.get(
-            "/admin/users/admin@example.com/edit",
+            "/v1/admin/users/admin@example.com/edit",
             headers=self.admin_headers,
-            name="/admin/users/[email]/edit",
+            name="/v1/admin/users/[email]/edit",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 404, 500])
@@ -7489,9 +7489,9 @@ class AdminDetailReadExtendedUser(BaseUser):
     def admin_config_settings(self):
         """GET /admin/config/settings - Config settings."""
         with self.client.get(
-            "/admin/config/settings",
+            "/v1/admin/config/settings",
             headers=self.admin_headers,
-            name="/admin/config/settings",
+            name="/v1/admin/config/settings",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 500])
@@ -7527,10 +7527,10 @@ class AdminGrpcCRUDUser(BaseUser):
         }
 
         with self.client.post(
-            "/admin/grpc",
+            "/v1/admin/grpc",
             json=svc_data,
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/admin/grpc [create]",
+            name="/v1/admin/grpc [create]",
             catch_response=True,
         ) as response:
             if response.status_code in (200, 201):
@@ -7539,41 +7539,41 @@ class AdminGrpcCRUDUser(BaseUser):
                     svc_id = data.get("id") or data.get("name") or svc_name
                     # GET detail
                     time.sleep(0.05)
-                    self.client.get(f"/admin/grpc/{svc_id}", headers=self.admin_headers, name="/admin/grpc/[id] [read]")
+                    self.client.get(f"/v1/admin/grpc/{svc_id}", headers=self.admin_headers, name="/v1/admin/grpc/[id] [read]")
                     # PUT update
                     time.sleep(0.05)
                     with self.client.put(
-                        f"/admin/grpc/{svc_id}",
+                        f"/v1/admin/grpc/{svc_id}",
                         json={**svc_data, "description": f"Updated at {time.time()}"},
                         headers={**self.auth_headers, "Content-Type": "application/json"},
-                        name="/admin/grpc/[id] [update]",
+                        name="/v1/admin/grpc/[id] [update]",
                         catch_response=True,
                     ) as put_resp:
                         self._validate_status(put_resp, allowed_codes=[200, 403, 404, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                     # Reflect
                     time.sleep(0.05)
                     with self.client.post(
-                        f"/admin/grpc/{svc_id}/reflect",
+                        f"/v1/admin/grpc/{svc_id}/reflect",
                         headers=self.auth_headers,
-                        name="/admin/grpc/[id]/reflect",
+                        name="/v1/admin/grpc/[id]/reflect",
                         catch_response=True,
                     ) as reflect_resp:
                         self._validate_status(reflect_resp, allowed_codes=[200, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                     # Toggle state
                     time.sleep(0.05)
                     with self.client.post(
-                        f"/admin/grpc/{svc_id}/state",
+                        f"/v1/admin/grpc/{svc_id}/state",
                         headers=self.auth_headers,
-                        name="/admin/grpc/[id]/state",
+                        name="/v1/admin/grpc/[id]/state",
                         catch_response=True,
                     ) as state_resp:
                         self._validate_status(state_resp, allowed_codes=[200, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                     # Delete
                     time.sleep(0.05)
                     with self.client.post(
-                        f"/admin/grpc/{svc_id}/delete",
+                        f"/v1/admin/grpc/{svc_id}/delete",
                         headers=self.auth_headers,
-                        name="/admin/grpc/[id]/delete",
+                        name="/v1/admin/grpc/[id]/delete",
                         catch_response=True,
                     ) as del_resp:
                         self._validate_status(del_resp, allowed_codes=[200, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -7616,10 +7616,10 @@ class AdminHTMXEntityOpsUser(BaseUser):
         if A2A_IDS:
             agent_id = random.choice(A2A_IDS)
             with self.client.post(
-                f"/admin/a2a/{agent_id}/state",
+                f"/v1/admin/a2a/{agent_id}/state",
                 data="activate=true",
                 headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded"},
-                name="/admin/a2a/[id]/state",
+                name="/v1/admin/a2a/[id]/state",
                 catch_response=True,
             ) as r:
                 self._validate_status(r, allowed_codes=[200, 302, 303, 403, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -7633,10 +7633,10 @@ class AdminHTMXEntityOpsUser(BaseUser):
         if A2A_IDS:
             agent_id = random.choice(A2A_IDS)
             with self.client.post(
-                f"/admin/a2a/{agent_id}/test",
+                f"/v1/admin/a2a/{agent_id}/test",
                 json={"query": "Load test ping"},
                 headers={**self.auth_headers, "Content-Type": "application/json"},
-                name="/admin/a2a/[id]/test",
+                name="/v1/admin/a2a/[id]/test",
                 catch_response=True,
             ) as r:
                 self._validate_status(r, allowed_codes=[200, 403, 404, 500, 503, *INFRASTRUCTURE_ERROR_CODES])
@@ -7647,7 +7647,7 @@ class AdminHTMXEntityOpsUser(BaseUser):
         """POST /admin/gateways/{id}/state - Toggle gateway state."""
         if GATEWAY_IDS:
             gw_id = random.choice(GATEWAY_IDS)
-            with self.client.post(f"/admin/gateways/{gw_id}/state", headers=self.auth_headers, name="/admin/gateways/[id]/state", catch_response=True) as r:
+            with self.client.post(f"/v1/admin/gateways/{gw_id}/state", headers=self.auth_headers, name="/v1/admin/gateways/[id]/state", catch_response=True) as r:
                 self._validate_status(r, allowed_codes=[200, 403, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
 
     @task(1)
@@ -7655,10 +7655,10 @@ class AdminHTMXEntityOpsUser(BaseUser):
     def test_gateway(self):
         """POST /admin/gateways/test - Test gateway URL."""
         with self.client.post(
-            "/admin/gateways/test",
+            "/v1/admin/gateways/test",
             json={"url": "http://localhost:1"},
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/admin/gateways/test",
+            name="/v1/admin/gateways/test",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 400, 422, 500, 503, *INFRASTRUCTURE_ERROR_CODES])
@@ -7669,7 +7669,7 @@ class AdminHTMXEntityOpsUser(BaseUser):
         """POST /admin/servers/{id}/state - Toggle server state."""
         if SERVER_IDS:
             srv_id = random.choice(SERVER_IDS)
-            with self.client.post(f"/admin/servers/{srv_id}/state", headers=self.auth_headers, name="/admin/servers/[id]/state", catch_response=True) as r:
+            with self.client.post(f"/v1/admin/servers/{srv_id}/state", headers=self.auth_headers, name="/v1/admin/servers/[id]/state", catch_response=True) as r:
                 self._validate_status(r, allowed_codes=[200, 403, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
 
     @task(1)
@@ -7678,7 +7678,7 @@ class AdminHTMXEntityOpsUser(BaseUser):
         """POST /admin/prompts/{id}/state - Toggle prompt state."""
         if PROMPT_IDS:
             pid = random.choice(PROMPT_IDS)
-            with self.client.post(f"/admin/prompts/{pid}/state", headers=self.auth_headers, name="/admin/prompts/[id]/state", catch_response=True) as r:
+            with self.client.post(f"/v1/admin/prompts/{pid}/state", headers=self.auth_headers, name="/v1/admin/prompts/[id]/state", catch_response=True) as r:
                 self._validate_status(r, allowed_codes=[200, 403, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
 
     @task(1)
@@ -7687,7 +7687,7 @@ class AdminHTMXEntityOpsUser(BaseUser):
         """POST /admin/resources/{id}/state - Toggle resource state."""
         if RESOURCE_IDS:
             rid = random.choice(RESOURCE_IDS)
-            with self.client.post(f"/admin/resources/{rid}/state", headers=self.auth_headers, name="/admin/resources/[id]/state", catch_response=True) as r:
+            with self.client.post(f"/v1/admin/resources/{rid}/state", headers=self.auth_headers, name="/v1/admin/resources/[id]/state", catch_response=True) as r:
                 self._validate_status(r, allowed_codes=[200, 403, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
 
     @task(1)
@@ -7696,7 +7696,7 @@ class AdminHTMXEntityOpsUser(BaseUser):
         """POST /admin/tools/{id}/state - Toggle tool state."""
         if TOOL_IDS:
             tid = random.choice(TOOL_IDS)
-            with self.client.post(f"/admin/tools/{tid}/state", headers=self.auth_headers, name="/admin/tools/[id]/state", catch_response=True) as r:
+            with self.client.post(f"/v1/admin/tools/{tid}/state", headers=self.auth_headers, name="/v1/admin/tools/[id]/state", catch_response=True) as r:
                 self._validate_status(r, allowed_codes=[200, 403, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
 
     @task(1)
@@ -7704,9 +7704,9 @@ class AdminHTMXEntityOpsUser(BaseUser):
     def toggle_change_password(self):
         """POST /admin/change-password-required - Toggle setting."""
         with self.client.post(
-            "/admin/change-password-required",
+            "/v1/admin/change-password-required",
             headers=self.auth_headers,
-            name="/admin/change-password-required [toggle]",
+            name="/v1/admin/change-password-required [toggle]",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 403, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -7716,10 +7716,10 @@ class AdminHTMXEntityOpsUser(BaseUser):
     def update_passthrough_headers(self):
         """PUT /admin/config/passthrough-headers - Update config."""
         with self.client.put(
-            "/admin/config/passthrough-headers",
+            "/v1/admin/config/passthrough-headers",
             json={"headers": []},
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/admin/config/passthrough-headers [update]",
+            name="/v1/admin/config/passthrough-headers [update]",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 403, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -7745,9 +7745,9 @@ class AdminMCPRegistryOpsUser(BaseUser):
         if SERVER_IDS:
             server_id = random.choice(SERVER_IDS)
             with self.client.post(
-                f"/admin/mcp-registry/{server_id}/register",
+                f"/v1/admin/mcp-registry/{server_id}/register",
                 headers=self.auth_headers,
-                name="/admin/mcp-registry/[id]/register",
+                name="/v1/admin/mcp-registry/[id]/register",
                 catch_response=True,
             ) as response:
                 self._validate_status(response, allowed_codes=[200, 400, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -7757,10 +7757,10 @@ class AdminMCPRegistryOpsUser(BaseUser):
     def bulk_register(self):
         """POST /admin/mcp-registry/bulk-register - Bulk register."""
         with self.client.post(
-            "/admin/mcp-registry/bulk-register",
+            "/v1/admin/mcp-registry/bulk-register",
             json={"server_ids": []},
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/admin/mcp-registry/bulk-register",
+            name="/v1/admin/mcp-registry/bulk-register",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 400, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -7790,17 +7790,17 @@ class AdminLLMOpsUser(BaseUser):
     def test_llm(self):
         """POST /admin/llm/test - Test LLM connection."""
         with self.client.post(
-            "/admin/llm/test",
+            "/v1/admin/llm/test",
             json={"provider_type": "openai", "base_url": "http://localhost:1/v1", "api_key": "test"},
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/admin/llm/test",
+            name="/v1/admin/llm/test",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 400, 422, 500, 503, *INFRASTRUCTURE_ERROR_CODES])
 
     def _get_random_provider_id(self):
         """Fetch a random LLM provider ID."""
-        with self.client.get("/llm/providers", headers=self.auth_headers, name="/llm/providers [list for admin ops]", catch_response=True) as response:
+        with self.client.get("/v1/llm/providers", headers=self.auth_headers, name="/v1/llm/providers [list for admin ops]", catch_response=True) as response:
             if response.status_code != 200:
                 if LOADTEST_STRICT_VALIDATION:
                     response.failure(f"Failed to list LLM providers: {response.status_code}")
@@ -7828,7 +7828,7 @@ class AdminLLMOpsUser(BaseUser):
 
     def _get_random_model_id(self):
         """Fetch a random LLM model ID."""
-        with self.client.get("/llm/models", headers=self.auth_headers, name="/llm/models [list for admin ops]", catch_response=True) as response:
+        with self.client.get("/v1/llm/models", headers=self.auth_headers, name="/v1/llm/models [list for admin ops]", catch_response=True) as response:
             if response.status_code != 200:
                 if LOADTEST_STRICT_VALIDATION:
                     response.failure(f"Failed to list LLM models: {response.status_code}")
@@ -7860,7 +7860,7 @@ class AdminLLMOpsUser(BaseUser):
         """POST /admin/llm/providers/{id}/fetch-models - Fetch models."""
         pid = self._get_random_provider_id()
         if pid:
-            with self.client.post(f"/admin/llm/providers/{pid}/fetch-models", headers=self.auth_headers, name="/admin/llm/providers/[id]/fetch-models", catch_response=True) as r:
+            with self.client.post(f"/v1/admin/llm/providers/{pid}/fetch-models", headers=self.auth_headers, name="/v1/admin/llm/providers/[id]/fetch-models", catch_response=True) as r:
                 self._validate_status(r, allowed_codes=[200, 404, 500, 503, *INFRASTRUCTURE_ERROR_CODES])
 
     @task(1)
@@ -7869,7 +7869,7 @@ class AdminLLMOpsUser(BaseUser):
         """POST /admin/llm/providers/{id}/health - Check health."""
         pid = self._get_random_provider_id()
         if pid:
-            with self.client.post(f"/admin/llm/providers/{pid}/health", headers=self.auth_headers, name="/admin/llm/providers/[id]/health", catch_response=True) as r:
+            with self.client.post(f"/v1/admin/llm/providers/{pid}/health", headers=self.auth_headers, name="/v1/admin/llm/providers/[id]/health", catch_response=True) as r:
                 self._validate_status(r, allowed_codes=[200, 404, 500, 503, *INFRASTRUCTURE_ERROR_CODES])
 
     @task(1)
@@ -7878,7 +7878,7 @@ class AdminLLMOpsUser(BaseUser):
         """POST /admin/llm/providers/{id}/state - Toggle state."""
         pid = self._get_random_provider_id()
         if pid:
-            with self.client.post(f"/admin/llm/providers/{pid}/state", headers=self.auth_headers, name="/admin/llm/providers/[id]/state", catch_response=True) as r:
+            with self.client.post(f"/v1/admin/llm/providers/{pid}/state", headers=self.auth_headers, name="/v1/admin/llm/providers/[id]/state", catch_response=True) as r:
                 self._validate_status(r, allowed_codes=[200, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
 
     @task(1)
@@ -7887,7 +7887,7 @@ class AdminLLMOpsUser(BaseUser):
         """POST /admin/llm/providers/{id}/sync-models - Sync models."""
         pid = self._get_random_provider_id()
         if pid:
-            with self.client.post(f"/admin/llm/providers/{pid}/sync-models", headers=self.auth_headers, name="/admin/llm/providers/[id]/sync-models", catch_response=True) as r:
+            with self.client.post(f"/v1/admin/llm/providers/{pid}/sync-models", headers=self.auth_headers, name="/v1/admin/llm/providers/[id]/sync-models", catch_response=True) as r:
                 self._validate_status(r, allowed_codes=[200, 404, 500, 503, *INFRASTRUCTURE_ERROR_CODES])
 
     @task(1)
@@ -7895,7 +7895,7 @@ class AdminLLMOpsUser(BaseUser):
     def admin_provider_delete(self):
         """DELETE /admin/llm/providers/{id} - Delete provider (test with fake ID)."""
         fake_id = f"loadtest-{uuid.uuid4().hex[:8]}"
-        with self.client.delete(f"/admin/llm/providers/{fake_id}", headers=self.auth_headers, name="/admin/llm/providers/[id] [delete]", catch_response=True) as r:
+        with self.client.delete(f"/v1/admin/llm/providers/{fake_id}", headers=self.auth_headers, name="/v1/admin/llm/providers/[id] [delete]", catch_response=True) as r:
             self._validate_status(r, allowed_codes=[200, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
 
     @task(1)
@@ -7904,7 +7904,7 @@ class AdminLLMOpsUser(BaseUser):
         """POST /admin/llm/models/{id}/state - Toggle model state."""
         mid = self._get_random_model_id()
         if mid:
-            with self.client.post(f"/admin/llm/models/{mid}/state", headers=self.auth_headers, name="/admin/llm/models/[id]/state", catch_response=True) as r:
+            with self.client.post(f"/v1/admin/llm/models/{mid}/state", headers=self.auth_headers, name="/v1/admin/llm/models/[id]/state", catch_response=True) as r:
                 self._validate_status(r, allowed_codes=[200, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
 
     @task(1)
@@ -7912,7 +7912,7 @@ class AdminLLMOpsUser(BaseUser):
     def admin_model_delete(self):
         """DELETE /admin/llm/models/{id} - Delete model (test with fake ID)."""
         fake_id = f"loadtest-{uuid.uuid4().hex[:8]}"
-        with self.client.delete(f"/admin/llm/models/{fake_id}", headers=self.auth_headers, name="/admin/llm/models/[id] [delete]", catch_response=True) as r:
+        with self.client.delete(f"/v1/admin/llm/models/{fake_id}", headers=self.auth_headers, name="/v1/admin/llm/models/[id] [delete]", catch_response=True) as r:
             self._validate_status(r, allowed_codes=[200, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
 
 
@@ -7943,10 +7943,10 @@ class AdminObservabilityQueriesUser(BaseUser):
         }
 
         with self.client.post(
-            "/admin/observability/queries",
+            "/v1/admin/observability/queries",
             json=query_data,
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/admin/observability/queries [create]",
+            name="/v1/admin/observability/queries [create]",
             catch_response=True,
         ) as response:
             if response.status_code in (200, 201):
@@ -7956,32 +7956,32 @@ class AdminObservabilityQueriesUser(BaseUser):
                     if qid:
                         # GET
                         time.sleep(0.05)
-                        self.client.get(f"/admin/observability/queries/{qid}", headers=self.admin_headers, name="/admin/observability/queries/[id]")
+                        self.client.get(f"/v1/admin/observability/queries/{qid}", headers=self.admin_headers, name="/v1/admin/observability/queries/[id]")
                         # PUT update
                         time.sleep(0.05)
                         with self.client.put(
-                            f"/admin/observability/queries/{qid}",
+                            f"/v1/admin/observability/queries/{qid}",
                             json={**query_data, "description": f"Updated at {time.time()}"},
                             headers={**self.auth_headers, "Content-Type": "application/json"},
-                            name="/admin/observability/queries/[id] [update]",
+                            name="/v1/admin/observability/queries/[id] [update]",
                             catch_response=True,
                         ) as put_resp:
                             self._validate_status(put_resp, allowed_codes=[200, 404, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                         # Use
                         time.sleep(0.05)
                         with self.client.post(
-                            f"/admin/observability/queries/{qid}/use",
+                            f"/v1/admin/observability/queries/{qid}/use",
                             headers=self.auth_headers,
-                            name="/admin/observability/queries/[id]/use",
+                            name="/v1/admin/observability/queries/[id]/use",
                             catch_response=True,
                         ) as use_resp:
                             self._validate_status(use_resp, allowed_codes=[200, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                         # DELETE
                         time.sleep(0.05)
                         with self.client.delete(
-                            f"/admin/observability/queries/{qid}",
+                            f"/v1/admin/observability/queries/{qid}",
                             headers=self.auth_headers,
-                            name="/admin/observability/queries/[id] [delete]",
+                            name="/v1/admin/observability/queries/[id] [delete]",
                             catch_response=True,
                         ) as del_resp:
                             self._validate_status(del_resp, allowed_codes=[200, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -8023,7 +8023,7 @@ class MiscEndpointsUser(BaseUser):
         """POST /a2a/{agent_name}/invoke - Invoke A2A agent."""
         if not A2A_TESTING_ENABLED:
             return
-        with self.client.get("/a2a", headers=self.auth_headers, name="/a2a [list for invoke]", catch_response=True) as response:
+        with self.client.get("/v1/a2a", headers=self.auth_headers, name="/a2a [list for invoke]", catch_response=True) as response:
             if response.status_code != 200:
                 if LOADTEST_STRICT_VALIDATION:
                     response.failure(f"Failed to list A2A agents for invoke: {response.status_code}")
@@ -8038,10 +8038,10 @@ class MiscEndpointsUser(BaseUser):
                     name = agent.get("name")
                     if name:
                         with self.client.post(
-                            f"/a2a/{name}/invoke",
+                            f"/v1/a2a/{name}/invoke",
                             json={"message": "load test ping"},
                             headers={**self.auth_headers, "Content-Type": "application/json"},
-                            name="/a2a/[name]/invoke",
+                            name="/v1/a2a/[name]/invoke",
                             catch_response=True,
                         ) as r:
                             self._validate_status(r, allowed_codes=[200, 400, 404, 500, 503, *INFRASTRUCTURE_ERROR_CODES])
@@ -8060,10 +8060,10 @@ class MiscEndpointsUser(BaseUser):
     def selective_export(self):
         """POST /export/selective - Selective export."""
         with self.client.post(
-            "/export/selective",
+            "/v1/export/selective",
             json={"entity_types": ["tools"]},
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/export/selective",
+            name="/v1/export/selective",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 403, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -8073,10 +8073,10 @@ class MiscEndpointsUser(BaseUser):
     def import_config(self):
         """POST /import - Import configuration (empty)."""
         with self.client.post(
-            "/import",
+            "/v1/import",
             json={"import_data": {"tools": [], "servers": []}, "conflict_strategy": "update", "dry_run": True},
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/import",
+            name="/v1/import",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 400, 403, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -8086,10 +8086,10 @@ class MiscEndpointsUser(BaseUser):
     def admin_import_preview(self):
         """POST /admin/import/preview - Admin import preview."""
         with self.client.post(
-            "/admin/import/preview",
+            "/v1/admin/import/preview",
             json={"data": {"tools": []}},
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/admin/import/preview",
+            name="/v1/admin/import/preview",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 400, 403, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -8099,10 +8099,10 @@ class MiscEndpointsUser(BaseUser):
     def admin_import_configuration(self):
         """POST /admin/import/configuration - Admin import configuration."""
         with self.client.post(
-            "/admin/import/configuration",
+            "/v1/admin/import/configuration",
             json={"import_data": {"tools": [], "servers": []}, "conflict_strategy": "update", "dry_run": True},
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/admin/import/configuration",
+            name="/v1/admin/import/configuration",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 400, 403, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -8112,10 +8112,10 @@ class MiscEndpointsUser(BaseUser):
     def admin_selective_export(self):
         """POST /admin/export/selective - Admin selective export."""
         with self.client.post(
-            "/admin/export/selective",
+            "/v1/admin/export/selective",
             json={"entity_types": ["tools"]},
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/admin/export/selective",
+            name="/v1/admin/export/selective",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 403, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -8127,10 +8127,10 @@ class MiscEndpointsUser(BaseUser):
         if PROMPT_IDS:
             pid = random.choice(PROMPT_IDS)
             with self.client.post(
-                f"/prompts/{pid}",
+                f"/v1/prompts/{pid}",
                 json={"description": f"Updated at {time.time()}"},
                 headers={**self.auth_headers, "Content-Type": "application/json"},
-                name="/prompts/[id] [post update]",
+                name="/v1/prompts/[id] [post update]",
                 catch_response=True,
             ) as response:
                 self._validate_status(response, allowed_codes=[200, 403, 404, 405, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -8193,10 +8193,10 @@ class MiscEndpointsUser(BaseUser):
     def admin_login_post(self):
         """POST /admin/login - Admin login form submission."""
         with self.client.post(
-            "/admin/login",
+            "/v1/admin/login",
             data={"username": BASIC_AUTH_USER, "password": BASIC_AUTH_PASSWORD},
             headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded"},
-            name="/admin/login [post]",
+            name="/v1/admin/login [post]",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 302, 303, 401, 403, 422, *INFRASTRUCTURE_ERROR_CODES])
@@ -8206,9 +8206,9 @@ class MiscEndpointsUser(BaseUser):
     def admin_logout_post(self):
         """POST /admin/logout - Admin logout."""
         with self.client.post(
-            "/admin/logout",
+            "/v1/admin/logout",
             headers=self.admin_headers,
-            name="/admin/logout [post]",
+            name="/v1/admin/logout [post]",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 302, 303, 307, *INFRASTRUCTURE_ERROR_CODES])
@@ -8258,10 +8258,10 @@ class AdminHTMXEntityCRUDUser(BaseUser):
         tool_name = f"loadtest-admintool-{uuid.uuid4().hex[:8]}"
         form_data = f"name={tool_name}&description=Load+test+tool&integration_type=MCP"
         with self.client.post(
-            "/admin/tools",
+            "/v1/admin/tools",
             data=form_data,
             headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded", "HX-Request": "true"},
-            name="/admin/tools [create]",
+            name="/v1/admin/tools [create]",
             catch_response=True,
         ) as response:
             if response.status_code in (200, 201, 302):
@@ -8275,19 +8275,19 @@ class AdminHTMXEntityCRUDUser(BaseUser):
                     # Edit
                     time.sleep(0.05)
                     with self.client.post(
-                        f"/admin/tools/{tool_id}/edit",
+                        f"/v1/admin/tools/{tool_id}/edit",
                         data=f"name={tool_name}&description=Edited+by+load+test",
                         headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded", "HX-Request": "true"},
-                        name="/admin/tools/[id]/edit",
+                        name="/v1/admin/tools/[id]/edit",
                         catch_response=True,
                     ) as edit_resp:
                         self._validate_status(edit_resp, allowed_codes=[200, 302, 404, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                     # Delete
                     time.sleep(0.05)
                     with self.client.post(
-                        f"/admin/tools/{tool_id}/delete",
+                        f"/v1/admin/tools/{tool_id}/delete",
                         headers={**self.admin_headers, "HX-Request": "true"},
-                        name="/admin/tools/[id]/delete",
+                        name="/v1/admin/tools/[id]/delete",
                         catch_response=True,
                     ) as del_resp:
                         self._validate_status(del_resp, allowed_codes=[200, 302, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -8300,10 +8300,10 @@ class AdminHTMXEntityCRUDUser(BaseUser):
     def admin_tools_import(self):
         """POST /admin/tools/import - Import tools via admin."""
         with self.client.post(
-            "/admin/tools/import",
+            "/v1/admin/tools/import",
             json={"tools": []},
             headers={**self.auth_headers, "Content-Type": "application/json"},
-            name="/admin/tools/import",
+            name="/v1/admin/tools/import",
             catch_response=True,
         ) as response:
             self._validate_status(response, allowed_codes=[200, 302, 400, 403, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -8315,10 +8315,10 @@ class AdminHTMXEntityCRUDUser(BaseUser):
         srv_name = f"loadtest-adminsrv-{uuid.uuid4().hex[:8]}"
         form_data = f"name={srv_name}&description=Load+test+server"
         with self.client.post(
-            "/admin/servers",
+            "/v1/admin/servers",
             data=form_data,
             headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded", "HX-Request": "true"},
-            name="/admin/servers [create]",
+            name="/v1/admin/servers [create]",
             catch_response=True,
         ) as response:
             if response.status_code in (200, 201, 302):
@@ -8330,18 +8330,18 @@ class AdminHTMXEntityCRUDUser(BaseUser):
                 if srv_id:
                     time.sleep(0.05)
                     with self.client.post(
-                        f"/admin/servers/{srv_id}/edit",
+                        f"/v1/admin/servers/{srv_id}/edit",
                         data=f"name={srv_name}&description=Edited",
                         headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded", "HX-Request": "true"},
-                        name="/admin/servers/[id]/edit",
+                        name="/v1/admin/servers/[id]/edit",
                         catch_response=True,
                     ) as edit_resp:
                         self._validate_status(edit_resp, allowed_codes=[200, 302, 404, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                     time.sleep(0.05)
                     with self.client.post(
-                        f"/admin/servers/{srv_id}/delete",
+                        f"/v1/admin/servers/{srv_id}/delete",
                         headers={**self.admin_headers, "HX-Request": "true"},
-                        name="/admin/servers/[id]/delete",
+                        name="/v1/admin/servers/[id]/delete",
                         catch_response=True,
                     ) as del_resp:
                         self._validate_status(del_resp, allowed_codes=[200, 302, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -8356,10 +8356,10 @@ class AdminHTMXEntityCRUDUser(BaseUser):
         name = f"loadtest-adminprompt-{uuid.uuid4().hex[:8]}"
         form_data = f"name={name}&description=Load+test+prompt&template=Hello"
         with self.client.post(
-            "/admin/prompts",
+            "/v1/admin/prompts",
             data=form_data,
             headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded", "HX-Request": "true"},
-            name="/admin/prompts [create]",
+            name="/v1/admin/prompts [create]",
             catch_response=True,
         ) as response:
             if response.status_code in (200, 201, 302):
@@ -8371,15 +8371,15 @@ class AdminHTMXEntityCRUDUser(BaseUser):
                 if pid:
                     time.sleep(0.05)
                     with self.client.post(
-                        f"/admin/prompts/{pid}/edit",
+                        f"/v1/admin/prompts/{pid}/edit",
                         data=f"name={name}&description=Edited",
                         headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded", "HX-Request": "true"},
-                        name="/admin/prompts/[id]/edit",
+                        name="/v1/admin/prompts/[id]/edit",
                         catch_response=True,
                     ) as r:
                         self._validate_status(r, allowed_codes=[200, 302, 404, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                     time.sleep(0.05)
-                    with self.client.post(f"/admin/prompts/{pid}/delete", headers={**self.admin_headers, "HX-Request": "true"}, name="/admin/prompts/[id]/delete", catch_response=True) as r:
+                    with self.client.post(f"/v1/admin/prompts/{pid}/delete", headers={**self.admin_headers, "HX-Request": "true"}, name="/v1/admin/prompts/[id]/delete", catch_response=True) as r:
                         self._validate_status(r, allowed_codes=[200, 302, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                 response.success()
             elif response.status_code in (403, 409, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES):
@@ -8392,10 +8392,10 @@ class AdminHTMXEntityCRUDUser(BaseUser):
         name = f"loadtest-adminres-{uuid.uuid4().hex[:8]}"
         form_data = f"name={name}&uri=file:///tmp/{name}&description=Load+test"
         with self.client.post(
-            "/admin/resources",
+            "/v1/admin/resources",
             data=form_data,
             headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded", "HX-Request": "true"},
-            name="/admin/resources [create]",
+            name="/v1/admin/resources [create]",
             catch_response=True,
         ) as response:
             if response.status_code in (200, 201, 302):
@@ -8407,15 +8407,15 @@ class AdminHTMXEntityCRUDUser(BaseUser):
                 if rid:
                     time.sleep(0.05)
                     with self.client.post(
-                        f"/admin/resources/{rid}/edit",
+                        f"/v1/admin/resources/{rid}/edit",
                         data=f"name={name}&description=Edited",
                         headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded", "HX-Request": "true"},
-                        name="/admin/resources/[id]/edit",
+                        name="/v1/admin/resources/[id]/edit",
                         catch_response=True,
                     ) as r:
                         self._validate_status(r, allowed_codes=[200, 302, 404, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                     time.sleep(0.05)
-                    with self.client.post(f"/admin/resources/{rid}/delete", headers={**self.admin_headers, "HX-Request": "true"}, name="/admin/resources/[id]/delete", catch_response=True) as r:
+                    with self.client.post(f"/v1/admin/resources/{rid}/delete", headers={**self.admin_headers, "HX-Request": "true"}, name="/v1/admin/resources/[id]/delete", catch_response=True) as r:
                         self._validate_status(r, allowed_codes=[200, 302, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                 response.success()
             elif response.status_code in (403, 409, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES):
@@ -8430,10 +8430,10 @@ class AdminHTMXEntityCRUDUser(BaseUser):
         name = f"loadtest-admina2a-{uuid.uuid4().hex[:8]}"
         form_data = f"name={name}&endpoint_url=http://localhost:1&description=Load+test&visibility=public"
         with self.client.post(
-            "/admin/a2a",
+            "/v1/admin/a2a",
             data=form_data,
             headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded", "HX-Request": "true"},
-            name="/admin/a2a [create]",
+            name="/v1/admin/a2a [create]",
             catch_response=True,
         ) as response:
             if response.status_code in (200, 201, 302):
@@ -8451,7 +8451,7 @@ class AdminHTMXEntityCRUDUser(BaseUser):
         name = f"loadtest-admina2a-{uuid.uuid4().hex[:8]}"
         agent_data = {"agent": {"name": name, "endpoint_url": "http://localhost:1", "description": "Load test"}}
         with self.client.post(
-            "/a2a",
+            "/v1/a2a",
             json=agent_data,
             headers={**self.auth_headers, "Content-Type": "application/json"},
             name="/a2a [create for admin crud]",
@@ -8466,15 +8466,15 @@ class AdminHTMXEntityCRUDUser(BaseUser):
                 if aid:
                     time.sleep(0.05)
                     with self.client.post(
-                        f"/admin/a2a/{aid}/edit",
+                        f"/v1/admin/a2a/{aid}/edit",
                         data=f"name={name}&endpoint_url=http://localhost:1&description=Edited",
                         headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded", "HX-Request": "true"},
-                        name="/admin/a2a/[id]/edit",
+                        name="/v1/admin/a2a/[id]/edit",
                         catch_response=True,
                     ) as r:
                         self._validate_status(r, allowed_codes=[200, 302, 303, 404, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                     time.sleep(0.05)
-                    with self.client.post(f"/admin/a2a/{aid}/delete", headers={**self.admin_headers, "HX-Request": "true"}, name="/admin/a2a/[id]/delete", catch_response=True) as r:
+                    with self.client.post(f"/v1/admin/a2a/{aid}/delete", headers={**self.admin_headers, "HX-Request": "true"}, name="/v1/admin/a2a/[id]/delete", catch_response=True) as r:
                         self._validate_status(r, allowed_codes=[200, 302, 303, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                 response.success()
             elif response.status_code in (409, 422, *INFRASTRUCTURE_ERROR_CODES):
@@ -8487,10 +8487,10 @@ class AdminHTMXEntityCRUDUser(BaseUser):
         name = f"loadtest-admingw-{uuid.uuid4().hex[:8]}"
         form_data = f"name={name}&url=http://localhost:1&description=Load+test"
         with self.client.post(
-            "/admin/gateways",
+            "/v1/admin/gateways",
             data=form_data,
             headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded", "HX-Request": "true"},
-            name="/admin/gateways [create]",
+            name="/v1/admin/gateways [create]",
             catch_response=True,
         ) as response:
             if response.status_code in (200, 201, 302):
@@ -8502,15 +8502,15 @@ class AdminHTMXEntityCRUDUser(BaseUser):
                 if gid:
                     time.sleep(0.05)
                     with self.client.post(
-                        f"/admin/gateways/{gid}/edit",
+                        f"/v1/admin/gateways/{gid}/edit",
                         data=f"name={name}&description=Edited",
                         headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded", "HX-Request": "true"},
-                        name="/admin/gateways/[id]/edit",
+                        name="/v1/admin/gateways/[id]/edit",
                         catch_response=True,
                     ) as r:
                         self._validate_status(r, allowed_codes=[200, 302, 404, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                     time.sleep(0.05)
-                    with self.client.post(f"/admin/gateways/{gid}/delete", headers={**self.admin_headers, "HX-Request": "true"}, name="/admin/gateways/[id]/delete", catch_response=True) as r:
+                    with self.client.post(f"/v1/admin/gateways/{gid}/delete", headers={**self.admin_headers, "HX-Request": "true"}, name="/v1/admin/gateways/[id]/delete", catch_response=True) as r:
                         self._validate_status(r, allowed_codes=[200, 302, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                 response.success()
             elif response.status_code in (403, 409, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES):
@@ -8524,46 +8524,46 @@ class AdminHTMXEntityCRUDUser(BaseUser):
         encoded_uri = quote(uri, safe="")
         encoded_query_uri = quote(uri, safe="")
         with self.client.post(
-            "/admin/roots",
+            "/v1/admin/roots",
             data=f"uri={uri}&name=loadtest-root",
             headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded", "HX-Request": "true"},
-            name="/admin/roots [create]",
+            name="/v1/admin/roots [create]",
             catch_response=True,
         ) as response:
             if response.status_code in (200, 201, 302):
                 time.sleep(0.05)
                 with self.client.get(
-                    f"/admin/roots/{encoded_uri}",
+                    f"/v1/admin/roots/{encoded_uri}",
                     headers=self.auth_headers,
-                    name="/admin/roots/[uri]",
+                    name="/v1/admin/roots/[uri]",
                     catch_response=True,
                 ) as get_resp:
                     self._validate_status(get_resp, allowed_codes=[200, 404, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
 
                 time.sleep(0.05)
                 with self.client.post(
-                    f"/admin/roots/{encoded_uri}/update",
+                    f"/v1/admin/roots/{encoded_uri}/update",
                     data=f"uri={uri}&name=loadtest-root-updated",
                     headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded", "HX-Request": "true"},
-                    name="/admin/roots/[uri]/update",
+                    name="/v1/admin/roots/[uri]/update",
                     catch_response=True,
                 ) as upd_resp:
                     self._validate_status(upd_resp, allowed_codes=[200, 302, 303, 404, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
 
                 time.sleep(0.05)
                 with self.client.get(
-                    f"/admin/roots/export?uri={encoded_query_uri}",
+                    f"/v1/admin/roots/export?uri={encoded_query_uri}",
                     headers=self.auth_headers,
-                    name="/admin/roots/export",
+                    name="/v1/admin/roots/export",
                     catch_response=True,
                 ) as export_resp:
                     self._validate_status(export_resp, allowed_codes=[200, 404, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
 
                 time.sleep(0.05)
                 with self.client.post(
-                    f"/admin/roots/{encoded_uri}/delete",
+                    f"/v1/admin/roots/{encoded_uri}/delete",
                     headers={**self.admin_headers, "HX-Request": "true"},
-                    name="/admin/roots/[uri]/delete",
+                    name="/v1/admin/roots/[uri]/delete",
                     catch_response=True,
                 ) as del_resp:
                     self._validate_status(del_resp, allowed_codes=[200, 302, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
@@ -8596,40 +8596,40 @@ class AdminUsersOpsUser(BaseUser):
         email = f"loadtest-adminuser-{uuid.uuid4().hex[:8]}@example.com"
         form_data = f"email={email}&password=LoadTest123!&full_name=Load+Test+User"
         with self.client.post(
-            "/admin/users",
+            "/v1/admin/users",
             data=form_data,
             headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded", "HX-Request": "true"},
-            name="/admin/users [create]",
+            name="/v1/admin/users [create]",
             catch_response=True,
         ) as response:
             if response.status_code in (200, 201, 302):
                 # Activate
                 time.sleep(0.05)
-                with self.client.post(f"/admin/users/{email}/activate", headers={**self.admin_headers, "HX-Request": "true"}, name="/admin/users/[email]/activate", catch_response=True) as r:
+                with self.client.post(f"/v1/admin/users/{email}/activate", headers={**self.admin_headers, "HX-Request": "true"}, name="/v1/admin/users/[email]/activate", catch_response=True) as r:
                     self._validate_status(r, allowed_codes=[200, 302, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                 # Deactivate
                 time.sleep(0.05)
-                with self.client.post(f"/admin/users/{email}/deactivate", headers={**self.admin_headers, "HX-Request": "true"}, name="/admin/users/[email]/deactivate", catch_response=True) as r:
+                with self.client.post(f"/v1/admin/users/{email}/deactivate", headers={**self.admin_headers, "HX-Request": "true"}, name="/v1/admin/users/[email]/deactivate", catch_response=True) as r:
                     self._validate_status(r, allowed_codes=[200, 302, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                 # Force password change
                 time.sleep(0.05)
                 with self.client.post(
-                    f"/admin/users/{email}/force-password-change", headers={**self.admin_headers, "HX-Request": "true"}, name="/admin/users/[email]/force-password-change", catch_response=True
+                    f"/v1/admin/users/{email}/force-password-change", headers={**self.admin_headers, "HX-Request": "true"}, name="/v1/admin/users/[email]/force-password-change", catch_response=True
                 ) as r:
                     self._validate_status(r, allowed_codes=[200, 302, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                 # Update
                 time.sleep(0.05)
                 with self.client.post(
-                    f"/admin/users/{email}/update",
+                    f"/v1/admin/users/{email}/update",
                     data="full_name=Updated+Load+Test",
                     headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded", "HX-Request": "true"},
-                    name="/admin/users/[email]/update",
+                    name="/v1/admin/users/[email]/update",
                     catch_response=True,
                 ) as r:
                     self._validate_status(r, allowed_codes=[200, 302, 404, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                 # Delete
                 time.sleep(0.05)
-                with self.client.delete(f"/admin/users/{email}", headers=self.admin_headers, name="/admin/users/[email] [delete]", catch_response=True) as r:
+                with self.client.delete(f"/v1/admin/users/{email}", headers=self.admin_headers, name="/v1/admin/users/[email] [delete]", catch_response=True) as r:
                     self._validate_status(r, allowed_codes=[200, 302, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                 response.success()
             elif response.status_code in (403, 409, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES):
@@ -8666,10 +8666,10 @@ class AdminTeamsHTMXOpsUser(BaseUser):
         name = f"loadtest-adminteam-{uuid.uuid4().hex[:8]}"
         form_data = f"name={name}&description=Load+test+team&visibility=private"
         with self.client.post(
-            "/admin/teams",
+            "/v1/admin/teams",
             data=form_data,
             headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded", "HX-Request": "true"},
-            name="/admin/teams [create]",
+            name="/v1/admin/teams [create]",
             catch_response=True,
         ) as response:
             if response.status_code in (200, 201, 302):
@@ -8681,54 +8681,54 @@ class AdminTeamsHTMXOpsUser(BaseUser):
                 # Update
                 time.sleep(0.1)
                 with self.client.post(
-                    f"/admin/teams/{tid}/update",
+                    f"/v1/admin/teams/{tid}/update",
                     data=f"name={name}&description=Updated",
                     headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded", "HX-Request": "true"},
-                    name="/admin/teams/[id]/update",
+                    name="/v1/admin/teams/[id]/update",
                     catch_response=True,
                 ) as r:
                     self._validate_status(r, allowed_codes=[200, 302, 404, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                 # Add member
                 time.sleep(0.1)
                 with self.client.post(
-                    f"/admin/teams/{tid}/add-member",
+                    f"/v1/admin/teams/{tid}/add-member",
                     data="email=admin@example.com&role=viewer",
                     headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded", "HX-Request": "true"},
-                    name="/admin/teams/[id]/add-member",
+                    name="/v1/admin/teams/[id]/add-member",
                     catch_response=True,
                 ) as r:
                     self._validate_status(r, allowed_codes=[200, 302, 400, 404, 409, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                 # Update member role
                 time.sleep(0.1)
                 with self.client.post(
-                    f"/admin/teams/{tid}/update-member-role",
+                    f"/v1/admin/teams/{tid}/update-member-role",
                     data="email=admin@example.com&role=admin",
                     headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded", "HX-Request": "true"},
-                    name="/admin/teams/[id]/update-member-role",
+                    name="/v1/admin/teams/[id]/update-member-role",
                     catch_response=True,
                 ) as r:
                     self._validate_status(r, allowed_codes=[200, 302, 400, 404, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                 # Remove member
                 time.sleep(0.1)
                 with self.client.post(
-                    f"/admin/teams/{tid}/remove-member",
+                    f"/v1/admin/teams/{tid}/remove-member",
                     data="email=admin@example.com",
                     headers={**self.admin_headers, "Content-Type": "application/x-www-form-urlencoded", "HX-Request": "true"},
-                    name="/admin/teams/[id]/remove-member",
+                    name="/v1/admin/teams/[id]/remove-member",
                     catch_response=True,
                 ) as r:
                     self._validate_status(r, allowed_codes=[200, 302, 400, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                 # Join request
                 time.sleep(0.1)
-                with self.client.post(f"/admin/teams/{tid}/join-request", headers={**self.admin_headers, "HX-Request": "true"}, name="/admin/teams/[id]/join-request", catch_response=True) as r:
+                with self.client.post(f"/v1/admin/teams/{tid}/join-request", headers={**self.admin_headers, "HX-Request": "true"}, name="/v1/admin/teams/[id]/join-request", catch_response=True) as r:
                     self._validate_status(r, allowed_codes=[200, 302, 400, 404, 409, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                 # Leave
                 time.sleep(0.1)
-                with self.client.post(f"/admin/teams/{tid}/leave", headers={**self.admin_headers, "HX-Request": "true"}, name="/admin/teams/[id]/leave", catch_response=True) as r:
+                with self.client.post(f"/v1/admin/teams/{tid}/leave", headers={**self.admin_headers, "HX-Request": "true"}, name="/v1/admin/teams/[id]/leave", catch_response=True) as r:
                     self._validate_status(r, allowed_codes=[200, 302, 400, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                 # Delete
                 time.sleep(0.1)
-                with self.client.delete(f"/admin/teams/{tid}", headers=self.admin_headers, name="/admin/teams/[id] [delete]", catch_response=True) as r:
+                with self.client.delete(f"/v1/admin/teams/{tid}", headers=self.admin_headers, name="/v1/admin/teams/[id] [delete]", catch_response=True) as r:
                     self._validate_status(r, allowed_codes=[200, 302, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                 response.success()
             elif response.status_code in (403, 409, 422, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES):
@@ -8740,7 +8740,7 @@ class AdminTeamsHTMXOpsUser(BaseUser):
         """Approve/reject/delete join requests via admin."""
         if TEAM_IDS:
             tid = random.choice(TEAM_IDS)
-            with self.client.get(f"/teams/{tid}/join-requests", headers=self.auth_headers, name="/teams/[id]/join-requests [for admin]", catch_response=True) as response:
+            with self.client.get(f"/v1/teams/{tid}/join-requests", headers=self.auth_headers, name="/v1/teams/[id]/join-requests [for admin]", catch_response=True) as response:
                 if response.status_code == 200:
                     try:
                         data = response.json()
@@ -8752,23 +8752,23 @@ class AdminTeamsHTMXOpsUser(BaseUser):
                                 action = random.choice(["approve", "reject", "delete"])
                                 if action == "approve":
                                     with self.client.post(
-                                        f"/admin/teams/{tid}/join-requests/{rid}/approve",
+                                        f"/v1/admin/teams/{tid}/join-requests/{rid}/approve",
                                         headers={**self.admin_headers, "HX-Request": "true"},
-                                        name="/admin/teams/[id]/join-requests/[id]/approve",
+                                        name="/v1/admin/teams/[id]/join-requests/[id]/approve",
                                         catch_response=True,
                                     ) as r:
                                         self._validate_status(r, allowed_codes=[200, 302, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                                 elif action == "reject":
                                     with self.client.post(
-                                        f"/admin/teams/{tid}/join-requests/{rid}/reject",
+                                        f"/v1/admin/teams/{tid}/join-requests/{rid}/reject",
                                         headers={**self.admin_headers, "HX-Request": "true"},
-                                        name="/admin/teams/[id]/join-requests/[id]/reject",
+                                        name="/v1/admin/teams/[id]/join-requests/[id]/reject",
                                         catch_response=True,
                                     ) as r:
                                         self._validate_status(r, allowed_codes=[200, 302, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                                 else:
                                     with self.client.delete(
-                                        f"/admin/teams/{tid}/join-request/{rid}", headers=self.admin_headers, name="/admin/teams/[id]/join-request/[id] [delete]", catch_response=True
+                                        f"/v1/admin/teams/{tid}/join-request/{rid}", headers=self.admin_headers, name="/v1/admin/teams/[id]/join-request/[id] [delete]", catch_response=True
                                     ) as r:
                                         self._validate_status(r, allowed_codes=[200, 302, 404, *SOFT_SERVER_ERROR_CODES, *INFRASTRUCTURE_ERROR_CODES])
                     except Exception:

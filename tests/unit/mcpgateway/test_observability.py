@@ -1120,8 +1120,8 @@ class TestObservability:
     @pytest.mark.parametrize(
         ("path", "expected"),
         [
-            ("/servers/demo/mcp", True),
-            ("/servers/demo/message/", True),
+            ("/v1/servers/demo/mcp", True),
+            ("/v1/servers/demo/message/", True),
             ("/_internal/mcp/plugin", True),
             ("/mcp/sse", True),
             ("/mcp/message", True),
@@ -1168,7 +1168,7 @@ class TestObservability:
         scope = {
             "type": "http",
             "method": "GET",
-            "path": "/admin",
+            "path": "/v1/admin",
             "headers": [],
             "query_string": b"",
         }
@@ -1375,7 +1375,7 @@ class TestObservability:
         scope = {
             "type": "http",
             "method": "GET",
-            "path": "/servers/plugin-a/mcp",
+            "path": "/v1/servers/plugin-a/mcp",
             "headers": [(b"user-agent", b"pytest"), ("broken", b"value")],
             "query_string": "trace=1",
             "http_version": "1.1",
@@ -1497,7 +1497,7 @@ class TestObservability:
         scope = {
             "type": "http",
             "method": "GET",
-            "path": "/servers/plugin-a/mcp",
+            "path": "/v1/servers/plugin-a/mcp",
             "headers": [(b"user-agent", b"pytest")],
             "query_string": "trace=1",
             "http_version": "1.1",

@@ -364,7 +364,7 @@ class RateLimitedUser(FastHttpUser):
             return None
         try:
             with self.client.post(
-                f"/servers/{_server_id}/mcp",
+                f"/v1/servers/{_server_id}/mcp",
                 data=json.dumps(_jsonrpc(method, params)),
                 headers=self._headers(),
                 name=name,
@@ -449,7 +449,7 @@ class RateLimitedUser(FastHttpUser):
         if isinstance(result, dict) and result.get("isError"):
             try:
                 with self.client.post(
-                    f"/servers/{_server_id}/mcp",
+                    f"/v1/servers/{_server_id}/mcp",
                     data=json.dumps(_jsonrpc("tools/call", {"name": tool, "arguments": args})),
                     headers=self._headers(),
                     name="MCP tools/call [rate-limited]",

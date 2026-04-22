@@ -182,7 +182,7 @@ class TestRBACAdminEndpointAccess:
         setup_user("user@test.local", is_admin=False)
         client = TestClient(app)
 
-        response = client.get("/rbac/roles", headers={"Authorization": "Bearer test"})
+        response = client.get("/v1/rbac/roles", headers={"Authorization": "Bearer test"})
         assert response.status_code == 403
 
     def test_admin_can_list_roles(self, rbac_test_env):
@@ -191,7 +191,7 @@ class TestRBACAdminEndpointAccess:
         setup_user("admin@test.local", is_admin=True)
         client = TestClient(app)
 
-        response = client.get("/rbac/roles", headers={"Authorization": "Bearer test"})
+        response = client.get("/v1/rbac/roles", headers={"Authorization": "Bearer test"})
         # The important test: admin is NOT denied (not 403).
         # May get 200 or 500 (DetachedInstanceError from session scoping) — RBAC passed either way.
         assert response.status_code != 403, f"Admin should NOT be denied access to /rbac/roles (got {response.status_code})"
@@ -202,7 +202,7 @@ class TestRBACAdminEndpointAccess:
         setup_user("user@test.local", is_admin=False)
         client = TestClient(app)
 
-        response = client.get("/rbac/users/user@test.local/roles", headers={"Authorization": "Bearer test"})
+        response = client.get("/v1/rbac/users/user@test.local/roles", headers={"Authorization": "Bearer test"})
         assert response.status_code == 403
 
     def test_non_admin_cannot_assign_roles(self, rbac_test_env):
@@ -212,7 +212,7 @@ class TestRBACAdminEndpointAccess:
         client = TestClient(app)
 
         response = client.post(
-            "/rbac/users/user@test.local/roles",
+            "/v1/rbac/users/user@test.local/roles",
             json={"role_id": "some-role-id", "scope": "global"},
             headers={"Authorization": "Bearer test"},
         )
@@ -233,7 +233,7 @@ class TestEmailAuthAdminEndpoints:
         setup_user("user@test.local", is_admin=False)
         client = TestClient(app)
 
-        response = client.get("/auth/email/admin/users", headers={"Authorization": "Bearer test"})
+        response = client.get("/v1/auth/email/admin/users", headers={"Authorization": "Bearer test"})
         assert response.status_code == 403
 
     def test_admin_can_list_users(self, rbac_test_env):
@@ -242,7 +242,7 @@ class TestEmailAuthAdminEndpoints:
         setup_user("admin@test.local", is_admin=True)
         client = TestClient(app)
 
-        response = client.get("/auth/email/admin/users", headers={"Authorization": "Bearer test"})
+        response = client.get("/v1/auth/email/admin/users", headers={"Authorization": "Bearer test"})
         assert response.status_code == 200
 
 
@@ -257,8 +257,8 @@ class TestCrossEndpointConsistency:
     @pytest.mark.parametrize(
         "endpoint",
         [
-            "/rbac/roles",
-            "/rbac/my/roles",
+            "/v1/rbac/roles",
+            "/v1/rbac/my/roles",
         ],
     )
     def test_unauthenticated_user_denied(self, rbac_test_env, endpoint):
@@ -288,7 +288,7 @@ class TestPermissionDenialPropagation:
         setup_user("user@test.local", is_admin=False)
         client = TestClient(app)
 
-        response = client.get("/rbac/roles", headers={"Authorization": "Bearer test"})
+        response = client.get("/v1/rbac/roles", headers={"Authorization": "Bearer test"})
         assert response.status_code == 403
         data = response.json()
         assert "detail" in data
@@ -301,5 +301,5 @@ class TestPermissionDenialPropagation:
         client = TestClient(app)
 
         # Admin should pass RBAC checks (not get 403)
-        response = client.get("/rbac/roles", headers={"Authorization": "Bearer test"})
+        response = client.get("/v1/rbac/roles", headers={"Authorization": "Bearer test"})
         assert response.status_code != 403, f"Admin should NOT be denied access (got {response.status_code})"
