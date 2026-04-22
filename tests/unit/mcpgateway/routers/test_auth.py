@@ -12,10 +12,10 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 # Third-Party
 import pytest
-from fastapi import HTTPException
+from fastapi import HTTPException, Response
 
 # First-Party
-from mcpgateway.routers.auth import LoginRequest, get_db, login
+from mcpgateway.routers.auth import get_current_user_info, get_db, login, LoginRequest, logout
 
 
 class TestLoginRequest:
@@ -276,3 +276,108 @@ class TestLogin:
             assert exc_info.value.status_code == 400
             assert "restricted to admin accounts" in exc_info.value.detail
             mock_create_token.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_login_sets_cookie(self, mock_request, mock_db, mock_user):
+        """Test that login sets httpOnly cookie."""
+        with (
+            patch("mcpgateway.routers.auth.EmailAuthService") as mock_auth_service,
+            patch("mcpgateway.routers.auth.create_access_token", new_callable=AsyncMock) as mock_create_token,
+            patch("mcpgateway.routers.auth.set_auth_cookie") as mock_set_cookie,
+        ):
+            mock_service = MagicMock()
+            mock_service.authenticate_user = AsyncMock(return_value=mock_user)
+            mock_auth_service.return_value = mock_service
+            mock_create_token.return_value = ("test_token", 3600)
+
+            login_request = LoginRequest(email="test@example.com", password="password123", remember_me=False)
+            mock_response = MagicMock(spec=Response)
+
+            await login(login_request, mock_request, mock_response, mock_db)
+
+            mock_set_cookie.assert_called_once_with(mock_response, "test_token", remember_me=False)
+
+    @pytest.mark.asyncio
+    async def test_login_remember_me_sets_long_expiry(self, mock_request, mock_db, mock_user):
+        """Test that remember_me=True sets longer cookie expiry."""
+        with (
+            patch("mcpgateway.routers.auth.EmailAuthService") as mock_auth_service,
+            patch("mcpgateway.routers.auth.create_access_token", new_callable=AsyncMock) as mock_create_token,
+            patch("mcpgateway.routers.auth.set_auth_cookie") as mock_set_cookie,
+        ):
+            mock_service = MagicMock()
+            mock_service.authenticate_user = AsyncMock(return_value=mock_user)
+            mock_auth_service.return_value = mock_service
+            mock_create_token.return_value = ("test_token", 3600)
+
+            login_request = LoginRequest(email="test@example.com", password="password123", remember_me=True)
+            mock_response = MagicMock(spec=Response)
+
+            await login(login_request, mock_request, mock_response, mock_db)
+
+            mock_set_cookie.assert_called_once_with(mock_response, "test_token", remember_me=True)
+
+
+class TestGetCurrentUserInfo:
+    """Tests for /auth/me endpoint."""
+
+    @pytest.fixture
+    def mock_user(self):
+        """Create a mock email user."""
+        user = MagicMock()
+        user.id = "test-user-id"
+        user.email = "test@example.com"
+        user.full_name = "Test User"
+        user.is_active = True
+        user.is_admin = False
+        user.auth_provider = "local"
+        user.teams = []
+        return user
+
+    @pytest.mark.asyncio
+    async def test_get_current_user_info_success(self, mock_user):
+        """Test successful retrieval of current user info."""
+        with patch("mcpgateway.routers.auth.EmailUserResponse") as mock_response:
+            mock_response.from_email_user.return_value = MagicMock(
+                email="test@example.com",
+                full_name="Test User",
+                is_admin=False,
+            )
+
+            result = await get_current_user_info(mock_user)
+
+            mock_response.from_email_user.assert_called_once_with(mock_user)
+            assert result is not None
+
+
+class TestLogout:
+    """Tests for /auth/logout endpoint."""
+
+    @pytest.fixture
+    def mock_user(self):
+        """Create a mock email user."""
+        user = MagicMock()
+        user.email = "test@example.com"
+        return user
+
+    @pytest.mark.asyncio
+    async def test_logout_clears_cookie(self, mock_user):
+        """Test that logout clears authentication cookie."""
+        with patch("mcpgateway.routers.auth.clear_auth_cookie") as mock_clear_cookie:
+            mock_response = MagicMock(spec=Response)
+
+            result = await logout(mock_response, mock_user)
+
+            mock_clear_cookie.assert_called_once_with(mock_response)
+            assert result == {"message": "Logged out successfully"}
+
+    @pytest.mark.asyncio
+    async def test_logout_returns_success_message(self, mock_user):
+        """Test that logout returns success message."""
+        with patch("mcpgateway.routers.auth.clear_auth_cookie"):
+            mock_response = MagicMock(spec=Response)
+
+            result = await logout(mock_response, mock_user)
+
+            assert "message" in result
+            assert result["message"] == "Logged out successfully"

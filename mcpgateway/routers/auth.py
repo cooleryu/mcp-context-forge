@@ -13,17 +13,18 @@ It serves as the primary entry point for authentication workflows.
 from typing import Optional
 
 # Third-Party
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 
 # First-Party
 from mcpgateway.config import settings
-from mcpgateway.db import SessionLocal
-from mcpgateway.routers.email_auth import create_access_token, get_client_ip, get_user_agent
+from mcpgateway.db import EmailUser, SessionLocal
+from mcpgateway.routers.email_auth import create_access_token, get_client_ip, get_current_user, get_user_agent
 from mcpgateway.schemas import AuthenticationResponse, EmailUserResponse
 from mcpgateway.services.email_auth_service import EmailAuthService
 from mcpgateway.services.logging_service import LoggingService
+from mcpgateway.utils.security_cookies import clear_auth_cookie, set_auth_cookie
 
 # Initialize logging
 logging_service = LoggingService()
@@ -79,6 +80,7 @@ class LoginRequest(BaseModel):
     email: Optional[EmailStr] = None
     username: Optional[str] = None  # For compatibility
     password: str
+    remember_me: bool = False  # Cookie expiry: 30d if True, 1hr if False
 
     def get_email(self) -> str:
         """Get email from either email or username field.
@@ -120,15 +122,19 @@ class LoginRequest(BaseModel):
 
 
 @auth_router.post("/login", response_model=AuthenticationResponse)
-async def login(login_request: LoginRequest, request: Request, db: Session = Depends(get_db)):
+async def login(login_request: LoginRequest, request: Request, response: Response, db: Session = Depends(get_db)):
     """Authenticate user and return session JWT token.
 
     This endpoint provides Tier 1 authentication for session-based access.
     The returned JWT token should be used for UI access and API key management.
 
+    Supports both cookie-based (browser) and Bearer token (API) authentication.
+    Cookie is set automatically for browser clients; API clients use token from response body.
+
     Args:
-        login_request: Login credentials (email/username + password)
+        login_request: Login credentials (email/username + password + optional remember_me)
         request: FastAPI request object
+        response: FastAPI response object (for setting cookie)
         db: Database session
 
     Returns:
@@ -141,7 +147,8 @@ async def login(login_request: LoginRequest, request: Request, db: Session = Dep
         Email format (recommended):
             {
               "email": "admin@example.com",
-              "password": "ChangeMe_12345678$"
+              "password": "ChangeMe_12345678$",
+              "remember_me": false
             }
 
         Username format (compatibility):
@@ -170,9 +177,13 @@ async def login(login_request: LoginRequest, request: Request, db: Session = Dep
         # Create session JWT token (Tier 1 authentication)
         access_token, expires_in = await create_access_token(user)
 
+        # Set httpOnly cookie for browser clients (React SPA)
+        set_auth_cookie(response, access_token, remember_me=login_request.remember_me)
+
         logger.info(f"User {email} authenticated successfully")
 
         # Return session token for UI access and API key management
+        # Token in response body maintains retro-compatibility with API clients
         return AuthenticationResponse(
             access_token=access_token, token_type="bearer", expires_in=expires_in, user=EmailUserResponse.from_email_user(user)
         )  # nosec B106 - OAuth2 token type, not a password
@@ -185,3 +196,65 @@ async def login(login_request: LoginRequest, request: Request, db: Session = Dep
     except Exception as e:
         logger.error(f"Login error for {login_request.email or login_request.username}: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Authentication service error")
+
+
+@auth_router.get("/me", response_model=EmailUserResponse)
+async def get_current_user_info(current_user: EmailUser = Depends(get_current_user)) -> EmailUserResponse:
+    """Get current user profile information.
+
+    Supports both cookie-based (browser) and Bearer token (API) authentication.
+    Authentication is handled automatically by the auth middleware.
+
+    Args:
+        current_user: Currently authenticated user (injected by dependency)
+
+    Returns:
+        EmailUserResponse: User profile information including email, name, admin status, teams, and roles
+
+    Raises:
+        HTTPException: 401 if user is not authenticated
+
+    Examples:
+        Cookie-based (browser):
+            GET /auth/me
+            Cookie: jwt_token=<token>
+
+        Bearer token (API):
+            GET /auth/me
+            Authorization: Bearer <token>
+    """
+    return EmailUserResponse.from_email_user(current_user)
+
+
+@auth_router.post("/logout")
+async def logout(response: Response, current_user: EmailUser = Depends(get_current_user)) -> dict:
+    """Logout current user by clearing authentication cookie.
+
+    Clears the httpOnly JWT cookie. Note: JWT remains valid until expiry (stateless design).
+    For immediate revocation, use short token expiry times.
+
+    Supports both cookie-based (browser) and Bearer token (API) authentication.
+    Cookie is cleared for browser clients; API clients should discard the token.
+
+    Args:
+        response: FastAPI response object (for clearing cookie)
+        current_user: Currently authenticated user (injected by dependency)
+
+    Returns:
+        dict: Success message
+
+    Raises:
+        HTTPException: 401 if user is not authenticated
+
+    Examples:
+        Cookie-based (browser):
+            POST /auth/logout
+            Cookie: jwt_token=<token>
+
+        Bearer token (API):
+            POST /auth/logout
+            Authorization: Bearer <token>
+    """
+    clear_auth_cookie(response)
+    logger.info(f"User {current_user.email} logged out")
+    return {"message": "Logged out successfully"}
