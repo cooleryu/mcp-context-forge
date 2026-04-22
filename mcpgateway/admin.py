@@ -4630,6 +4630,46 @@ async def _admin_logout(request: Request) -> Response:
     LOGGER.info(f"Admin user logging out (method: {request.method})")
     root_path = _resolve_root_path(request)
 
+    # Revoke JWT token in blocklist for immediate invalidation
+    cookies = getattr(request, "cookies", None)
+    if cookies and hasattr(cookies, "get"):
+        token = cookies.get("jwt_token")
+        if isinstance(token, str) and token:
+            try:
+                # First-Party
+                from mcpgateway.services.token_blocklist_service import get_token_blocklist_service  # pylint: disable=import-outside-toplevel
+
+                payload = await verify_jwt_token_cached(token, request)
+                jti = payload.get("jti")
+                email = payload.get("email", "admin")
+
+                if jti:
+                    blocklist_service = get_token_blocklist_service()
+
+                    # Get token expiry from payload
+                    exp_ts = payload.get("exp")
+                    token_expiry = None
+                    if exp_ts:
+                        # Standard
+                        from datetime import datetime, timezone  # pylint: disable=import-outside-toplevel
+
+                        token_expiry = datetime.fromtimestamp(exp_ts, tz=timezone.utc)
+
+                    # Get last activity if present
+                    last_activity = None
+                    last_activity_ts = payload.get("last_activity")
+                    if last_activity_ts:
+                        # Standard
+                        from datetime import datetime, timezone  # pylint: disable=import-outside-toplevel
+
+                        last_activity = datetime.fromtimestamp(last_activity_ts, tz=timezone.utc)
+
+                    blocklist_service.revoke_token(jti=jti, revoked_by=email, reason="admin_logout", token_expiry=token_expiry, last_activity=last_activity)
+                    LOGGER.info(f"Token revoked during admin logout: jti={jti}", extra={"security_event": "admin_logout_token_revoked", "security_severity": "low", "jti": jti, "user_id": email})
+            except Exception as revoke_error:
+                # Log but don't fail logout if token revocation fails
+                LOGGER.warning(f"Failed to revoke token during admin logout: {revoke_error}")
+
     # For GET requests, distinguish between browser navigation and OIDC front-channel logout
     if request.method == "GET":
         # Check if request is from a browser (Accept: text/html, HX-Request header, or admin referer)
@@ -16564,6 +16604,7 @@ async def _sync_plugin_service_from_runtime(request: Request, plugin_service) ->
     """
     try:
         # pylint: disable=import-outside-toplevel
+        # First-Party
         from mcpgateway.plugins.framework import get_plugin_manager
 
         plugin_manager = await get_plugin_manager()
@@ -16690,6 +16731,7 @@ async def list_plugins(
             },
         )
 
+        # First-Party
         from mcpgateway.plugins.framework import are_plugins_enabled_shared  # pylint: disable=import-outside-toplevel
 
         return PluginListResponse(plugins_globally_enabled=await are_plugins_enabled_shared(), plugins=plugins, total=len(plugins), enabled_count=enabled_count, disabled_count=disabled_count)
@@ -16709,6 +16751,7 @@ async def toggle_plugins_global(
 ) -> PluginToggleResponse:
     """Enable or disable the plugin subsystem globally and broadcast the change."""
     # pylint: disable=import-outside-toplevel
+    # First-Party
     from mcpgateway.plugins.framework import are_plugins_enabled_shared, enable_plugins_shared, get_plugin_manager
 
     redis_persisted = await enable_plugins_shared(payload.enabled)
@@ -16905,6 +16948,7 @@ async def update_plugin_mode(
 ) -> PluginModeUpdateResponse:
     """Persist a per-plugin mode override in Redis and invalidate cached managers."""
     # pylint: disable=import-outside-toplevel
+    # First-Party
     from mcpgateway.plugins.framework import invalidate_all_plugin_managers, list_configured_plugin_names, publish_plugin_mode_change
 
     mode = payload.mode
