@@ -63,24 +63,25 @@ class BaseService(ABC):
         """Resolve team membership and apply visibility filtering to a query.
 
         Handles the full access-control flow for list endpoints:
-        1. Returns query unmodified when no auth context is present (admin bypass)
-        2. Resolves effective teams from JWT token_teams or DB lookup
-        3. Suppresses owner matching for public-only tokens (token_teams=[])
-        4. Delegates to _apply_visibility_filter for SQL WHERE construction
+        1. Admin bypass (user_email=None AND token_teams=None): filter private out
+           (admin sees public + team resources, but NEVER other users' private).
+        2. Resolves effective teams from JWT token_teams or DB lookup.
+        3. Suppresses owner matching for public-only tokens (token_teams=[]).
+        4. Delegates to _apply_visibility_filter for SQL WHERE construction.
 
         Args:
-            query: SQLAlchemy query to filter
-            db: Database session (for team membership lookup when token_teams is None)
-            user_email: User's email. None = no user context.
+            query: SQLAlchemy query to filter.
+            db: Database session (for team membership lookup when token_teams is None).
+            user_email: User's email. ``None`` = no user context.
             token_teams: Teams from JWT via normalize_token_teams().
-                None = admin bypass or no auth context.
-                [] = public-only token.
-                [...] = team-scoped token.
-            team_id: Optional specific team filter
+                ``None`` = admin bypass or no auth context.
+                ``[]`` = public-only token.
+                ``[...]`` = team-scoped token.
+            team_id: Optional specific team filter.
 
         Returns:
-            Query with visibility WHERE clauses applied, or unmodified
-            if no auth context is present.
+            Query with visibility WHERE clauses applied. Admin bypass still excludes
+            private rows (security invariant: admin bypass never exposes private resources).
         """
         if user_email is None and token_teams is None:
             model_cls = self._visibility_model_cls

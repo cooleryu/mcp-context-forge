@@ -174,8 +174,10 @@ class CompletionService:
         Returns:
             Scoped SQLAlchemy statement.
         """
+        # SECURITY (Layer 1): admin bypass (both None) excludes private entities so
+        # completion suggestions cannot reveal other users' private prompt/resource names.
         if token_teams is None and user_email is None:
-            return stmt
+            return stmt.where(model.visibility != "private")
 
         is_public_only_token = token_teams is not None and len(token_teams) == 0
         access_conditions = [model.visibility == "public"]

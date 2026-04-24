@@ -2,6 +2,48 @@
 
 > All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project **adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)**.
 
+## [Unreleased]
+
+### ⚠️ Security / Breaking Change — Admin bypass no longer reveals private resources ([#4323](https://github.com/IBM/mcp-context-forge/issues/4323), [#4341](https://github.com/IBM/mcp-context-forge/pull/4341))
+
+**Action Required for integrators relying on admin-bypass reads of other users' private resources.**
+
+Admin bypass (`is_admin=true` with `teams: null` in the JWT, or dev-mode basic-auth admin) now grants access only to **public** and **team** resources. Private resources (visibility=`private`) are only accessible to their owner — admin bypass can no longer read, update, delete, list, or enumerate another user's private tools, prompts, resources, servers, gateways, or A2A agents.
+
+**Enforcement applied at the service layer for:**
+
+- `ToolService.get_tool`, `list_tools`
+- `PromptService.get_prompt`, `get_prompt_details`, `list_prompts`
+- `ResourceService.get_resource_by_id`, `read_resource`, `list_resources`
+- `ServerService.get_server`, `list_servers`
+- `GatewayService.get_gateway`, `list_gateways`
+- `A2AAgentService.get_agent`, `get_agent_by_name`, `get_agent_card`, `cancel_task`, `get_task`
+- `BaseService._apply_access_control` (list endpoints inheriting from `BaseService`)
+
+**Behavior for denied access:**
+
+- Direct-ID reads return `404 Not Found` (not 403) to avoid disclosing the existence of private resources.
+- A structured log event (`*_access_denied`, e.g. `tool_access_denied`) is emitted for forensics.
+
+**What's unchanged:**
+
+- Public-resource access for admin bypass — unchanged.
+- Team-resource access for admin bypass — unchanged.
+- Resource owners can still access their own private resources.
+- Scoped tokens (`teams: [...]`) continue to use their scoped team list; admin-bypass detection still requires both `is_admin=true` **and** `teams: null`.
+
+**Migration guidance for integrators:**
+
+- Audit tokens/scripts that currently rely on an admin listing or reading another user's private data. Transfer resource ownership or switch them to `team`-scoped visibility if the cross-user access is intentional.
+- If an admin genuinely needs cross-user visibility for an operational scenario, prefer a properly scoped token (`teams: ["<target_team>"]`) over relying on bypass.
+- Callers of `server_service.get_server`, `gateway_service.get_gateway`, `prompt_service.get_prompt_details`, `resource_service.get_resource_by_id`, and `a2a_service.get_agent_by_name`/`get_agent_card` now accept new optional `user_email` / `token_teams` parameters. Omitting them evaluates as admin-bypass (public + team access, private denied). Call sites in `mcpgateway/main.py` and `mcpgateway/admin.py` have been updated to forward the caller's scope via `_get_scoped_resource_access_context`.
+
+**Related security invariants (see `AGENTS.md`):**
+
+- `public` is platform-public scope, not internet-anonymous.
+- Token-team interpretation continues to flow through `normalize_token_teams()` / `resolve_session_teams()` in `mcpgateway/auth.py`.
+- Non-JWT admin (basic-auth / dev-mode) retains unrestricted access to public and team resources, but is now also denied direct reads of other users' private resources.
+
 ## [1.0.0-RC3] - 2026-04-14 - Auth Hardening, Plugin Multi-Tenancy, Rust Runtime & Multi-Arch
 
 ### Overview

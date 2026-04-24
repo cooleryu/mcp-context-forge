@@ -376,8 +376,10 @@ class TagService:
         Returns:
             Scoped SQLAlchemy statement.
         """
+        # SECURITY (Layer 1): admin bypass (both None) filters out private entities so
+        # admin-bypass callers cannot enumerate other users' private resources via tags.
         if token_teams is None and user_email is None:
-            return stmt
+            return stmt.where(model.visibility != "private")
 
         is_public_only_token = token_teams is not None and len(token_teams) == 0
         access_conditions = [model.visibility == "public"]
