@@ -538,7 +538,7 @@ async def trace_correlation_id(correlation_id: str, user=Depends(get_current_use
 
     except Exception as e:
         logger.error(f"Correlation trace failed: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Correlation trace failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Correlation trace failed")
 
 
 @router.get("/security-events", response_model=List[SecurityEventResponse])
@@ -614,7 +614,7 @@ async def get_security_events(
 
     except Exception as e:
         logger.error(f"Security events query failed: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Security events query failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Security events query failed")
 
 
 @router.get("/audit-trails", response_model=List[AuditTrailResponse])
@@ -695,7 +695,7 @@ async def get_audit_trails(
 
     except Exception as e:
         logger.error(f"Audit trails query failed: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Audit trails query failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Audit trails query failed")
 
 
 @router.get("/performance-metrics", response_model=List[PerformanceMetricResponse])

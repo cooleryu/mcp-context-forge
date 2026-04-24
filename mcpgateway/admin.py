@@ -2231,7 +2231,8 @@ async def update_global_passthrough_headers(
         raise HTTPException(status_code=422, detail="Invalid passthrough headers format") from e
     except PassthroughHeadersError as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail=str(e)) from e
+        LOGGER.error(f"Passthrough headers error: {e}")
+        raise HTTPException(status_code=500, detail="Passthrough headers error") from e
 
 
 @admin_router.post("/config/passthrough-headers/invalidate-cache")
@@ -13406,7 +13407,7 @@ async def admin_export_root(
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
         LOGGER.error(f"Unexpected root export error for user {get_user_email(user)}: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Root export failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Root export failed")
 
 
 @admin_router.get("/roots/{uri:path}")
@@ -14262,7 +14263,7 @@ async def admin_list_tags(
         return result
     except Exception as e:
         LOGGER.error(f"Failed to retrieve tags for admin: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to retrieve tags: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to retrieve tags")
 
 
 async def _read_request_json(request: Request) -> Any:
@@ -14970,7 +14971,7 @@ async def admin_export_configuration(
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         LOGGER.error(f"Unexpected admin export error for user {user}: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Export failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Export failed")
 
 
 @admin_router.post("/export/selective")
@@ -15034,7 +15035,7 @@ async def admin_export_selective(request: Request, db: Session = Depends(get_db)
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         LOGGER.error(f"Unexpected admin selective export error for user {user}: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Export failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Export failed")
 
 
 @admin_router.post("/import/preview")
@@ -15067,7 +15068,7 @@ async def admin_import_preview(request: Request, db: Session = Depends(get_db), 
         try:
             data = await _read_request_json(request)
         except ValueError as e:
-            raise HTTPException(status_code=400, detail=f"Invalid JSON: {str(e)}")
+            raise HTTPException(status_code=400, detail="Invalid JSON in request body")
 
         # Extract import data
         import_data = data.get("data")
@@ -15085,12 +15086,12 @@ async def admin_import_preview(request: Request, db: Session = Depends(get_db), 
 
     except ImportValidationError as e:
         LOGGER.error(f"Import validation failed for user {user}: {str(e)}")
-        raise HTTPException(status_code=400, detail=f"Invalid import data: {str(e)}")
+        raise HTTPException(status_code=400, detail=str(e))
     except HTTPException:
         raise
     except Exception as e:
         LOGGER.error(f"Import preview failed for user {user}: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Preview failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Preview failed")
 
 
 @admin_router.post("/import/configuration")
@@ -15156,7 +15157,7 @@ async def admin_import_configuration(request: Request, db: Session = Depends(get
         raise
     except Exception as e:
         LOGGER.error(f"Unexpected admin import error for user {user}: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Import failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Import failed")
 
 
 @admin_router.get("/import/status/{import_id}")
@@ -16091,7 +16092,7 @@ async def admin_create_grpc_service(
         raise HTTPException(status_code=409, detail=str(e))
     except GrpcServiceError as e:
         LOGGER.error(f"gRPC service error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="gRPC service error")
 
 
 @admin_router.get("/grpc/{service_id}", response_model=GrpcServiceRead)
@@ -16163,7 +16164,7 @@ async def admin_update_grpc_service(
         raise HTTPException(status_code=409, detail=str(e))
     except GrpcServiceError as e:
         LOGGER.error(f"gRPC service error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="gRPC service error")
 
 
 @admin_router.post("/grpc/{service_id}/state")
@@ -16262,7 +16263,7 @@ async def admin_reflect_grpc_service(
         raise HTTPException(status_code=404, detail=str(e))
     except GrpcServiceError as e:
         LOGGER.error(f"gRPC service error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="gRPC service error")
 
 
 @admin_router.get("/grpc/{service_id}/methods")
@@ -16701,7 +16702,7 @@ async def list_plugins(
     except Exception as e:
         LOGGER.error(f"Error listing plugins: {e}")
         structured_logger.error("Failed to list plugins in marketplace", user_id=get_user_id(user), user_email=get_user_email(user), error=e, component="plugin_marketplace", category="business_logic")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to list plugins")
 
 
 @admin_router.put("/plugins", response_model=PluginToggleResponse)
@@ -16817,7 +16818,7 @@ async def get_plugin_stats(request: Request, db: Session = Depends(get_db), user
         structured_logger.error(
             "Failed to get plugin marketplace statistics", user_id=get_user_id(user), user_email=get_user_email(user), error=e, component="plugin_marketplace", category="business_logic"
         )
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to retrieve plugin statistics")
 
 
 @admin_router.get("/plugins/{name}", response_model=PluginDetail)
@@ -16897,7 +16898,7 @@ async def get_plugin_details(name: str, request: Request, db: Session = Depends(
         structured_logger.error(
             f"Failed to get plugin details: '{name}'", user_id=get_user_id(user), user_email=get_user_email(user), error=e, component="plugin_marketplace", category="business_logic"
         )
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to retrieve plugin details")
 
 
 @admin_router.put("/plugins/{name}", response_model=PluginModeUpdateResponse)
@@ -17339,7 +17340,7 @@ async def get_system_stats(
 
     except Exception as e:
         LOGGER.error(f"System metrics retrieval failed for user {user}: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Failed to retrieve system metrics: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to retrieve system metrics")
 
 
 # ===================================
@@ -17420,7 +17421,7 @@ async def admin_generate_support_bundle(
 
     except Exception as e:
         LOGGER.error(f"Support bundle generation failed for user {user}: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Failed to generate support bundle: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to generate support bundle")
 
 
 # ============================================================================
@@ -18037,7 +18038,7 @@ async def get_latency_percentiles(
         return _get_latency_percentiles_python(db, cutoff_time, interval_minutes)
     except Exception as e:
         LOGGER.error(f"Failed to calculate latency percentiles: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to calculate latency percentiles")
     finally:
         # Ensure close() always runs even if commit() fails
         try:
@@ -18199,7 +18200,7 @@ async def get_timeseries_metrics(
         return _get_timeseries_metrics_python(db, cutoff_time, interval_minutes)
     except Exception as e:
         LOGGER.error(f"Failed to calculate timeseries metrics: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to calculate timeseries metrics")
     finally:
         # Ensure close() always runs even if commit() fails
         try:
@@ -18545,7 +18546,7 @@ async def get_top_slow_endpoints(
         return {"endpoints": endpoints}
     except Exception as e:
         LOGGER.error(f"Failed to get top slow endpoints: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to retrieve slow endpoints")
     finally:
         # Ensure close() always runs even if commit() fails
         try:
@@ -18612,7 +18613,7 @@ async def get_top_volume_endpoints(
         return {"endpoints": endpoints}
     except Exception as e:
         LOGGER.error(f"Failed to get top volume endpoints: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to retrieve volume endpoints")
     finally:
         # Ensure close() always runs even if commit() fails
         try:
@@ -18682,7 +18683,7 @@ async def get_top_error_endpoints(
         return {"endpoints": endpoints}
     except Exception as e:
         LOGGER.error(f"Failed to get top error endpoints: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to retrieve error endpoints")
     finally:
         # Ensure close() always runs even if commit() fails
         try:
@@ -18731,7 +18732,7 @@ async def get_latency_heatmap(
         return _get_latency_heatmap_python(db, cutoff_time, hours, time_buckets, latency_buckets)
     except Exception as e:
         LOGGER.error(f"Failed to generate latency heatmap: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to generate latency heatmap")
     finally:
         # Ensure close() always runs even if commit() fails
         try:
@@ -18804,7 +18805,7 @@ async def get_tool_usage(
         return {"tools": tools, "total_invocations": total_invocations, "time_range_hours": hours}
     except Exception as e:
         LOGGER.error(f"Failed to get tool usage statistics: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to retrieve tool usage statistics")
     finally:
         # Ensure close() always runs even if commit() fails
         try:
@@ -18856,7 +18857,7 @@ async def get_tool_performance(
         return {"tools": tools, "time_range_hours": hours}
     except Exception as e:
         LOGGER.error(f"Failed to get tool performance metrics: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to retrieve tool performance metrics")
     finally:
         # Ensure close() always runs even if commit() fails
         try:
@@ -18928,7 +18929,7 @@ async def get_tool_errors(
         return {"tools": tools, "time_range_hours": hours}
     except Exception as e:
         LOGGER.error(f"Failed to get tool error statistics: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to retrieve tool error statistics")
     finally:
         # Ensure close() always runs even if commit() fails
         try:
@@ -19008,7 +19009,7 @@ async def get_tool_chains(
         return {"chains": chains, "total_traces_with_tools": len(trace_tools), "time_range_hours": hours}
     except Exception as e:
         LOGGER.error(f"Failed to get tool chain statistics: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to retrieve tool chain statistics")
     finally:
         # Ensure close() always runs even if commit() fails
         try:
@@ -19114,7 +19115,7 @@ async def get_prompt_usage(
         return {"prompts": prompts, "total_renders": total_renders, "time_range_hours": hours}
     except Exception as e:
         LOGGER.error(f"Failed to get prompt usage statistics: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to retrieve prompt usage statistics")
     finally:
         # Ensure close() always runs even if commit() fails
         try:
@@ -19166,7 +19167,7 @@ async def get_prompt_performance(
         return {"prompts": prompts, "time_range_hours": hours}
     except Exception as e:
         LOGGER.error(f"Failed to get prompt performance metrics: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to retrieve prompt performance metrics")
     finally:
         # Ensure close() always runs even if commit() fails
         try:
@@ -19336,7 +19337,7 @@ async def get_resource_usage(
         return {"resources": resources, "total_fetches": total_fetches, "time_range_hours": hours}
     except Exception as e:
         LOGGER.error(f"Failed to get resource usage statistics: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to retrieve resource usage statistics")
     finally:
         # Ensure close() always runs even if commit() fails
         try:
@@ -19388,7 +19389,7 @@ async def get_resource_performance(
         return {"resources": resources, "time_range_hours": hours}
     except Exception as e:
         LOGGER.error(f"Failed to get resource performance metrics: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Failed to retrieve resource performance metrics")
     finally:
         # Ensure close() always runs even if commit() fails
         try:
@@ -19554,7 +19555,7 @@ async def get_performance_stats(
 
     except Exception as e:
         LOGGER.error(f"Performance metrics retrieval failed: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Failed to retrieve performance metrics: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to retrieve performance metrics")
 
 
 @admin_router.get("/performance/system")
